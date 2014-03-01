@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "description": "appium uiauto ios driver",
   "main": "index.js",
+  "bin": {
+    "instruments-client.js": "./bin/instruments-client.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/appium/appium-uiauto/issues"
   },
-  "homepage": "https://github.com/appium/appium-uiauto"
+  "homepage": "https://github.com/appium/appium-uiauto",
+  "dependencies": {
+    "argparse": "~0.1.15"
+  }
 }

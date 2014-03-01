@@ -99,24 +99,26 @@ var globalPath = (function () {
 
 // figure out where instruments client is (relative to where appium is run)
 var clientPath = (function () {
-  var client = 'bin/instruments-client.js';
-  var module = 'node_modules/appium/';
+  return './node_modules/.bin/instruments-client.js'
 
-  try {
-    sysExec('ls ' + client);
-    return client;
-  } catch (e) {
-    try {
-      sysExec('ls ' + module + client);
-      return module + client;
-    } catch (e) {
-      if (globalPath === null) {
-        console.log("WARNING: could not find bin/instruments-client.js in its " +
-                    "usual place, and global instruments_client not around " +
-                    "either. This could cause problems");
-      }
-    }
-  }
+  // var client = 'bin/instruments-client.js';
+  // var module = 'node_modules/appium/';
+
+  // try {
+  //   sysExec('ls ' + client);
+  //   return client;
+  // } catch (e) {
+  //   try {
+  //     sysExec('ls ' + module + client);
+  //     return module + client;
+  //   } catch (e) {
+  //     if (globalPath === null) {
+  //       console.log("WARNING: could not find bin/instruments-client.js in its " +
+  //                   "usual place, and global instruments_client not around " +
+  //                   "either. This could cause problems");
+  //     }
+  //   }
+  // }
 })();
 
 var nodePathAppiumConfig = function () {
