@@ -88,150 +88,26 @@ settings = function () {
 /* exported isVerbose */
 var isVerbose = (typeof settings !== "undefined" && 'verbose' in settings && settings.verbose === 'true');
 
-// get npm-installed instruments_client bin if necessary
-var globalPath = (function () {
-  try {
-    return sysExec('which instruments_client');
-  } catch (e) {
-    return null;
-  }
-})();
-
 // figure out where instruments client is (relative to where appium is run)
-var clientPath = (function () {
-  return './node_modules/.bin/instruments-client.js'
-
-  // var client = 'bin/instruments-client.js';
-  // var module = 'node_modules/appium/';
-
-  // try {
-  //   sysExec('ls ' + client);
-  //   return client;
-  // } catch (e) {
-  //   try {
-  //     sysExec('ls ' + module + client);
-  //     return module + client;
-  //   } catch (e) {
-  //     if (globalPath === null) {
-  //       console.log("WARNING: could not find bin/instruments-client.js in its " +
-  //                   "usual place, and global instruments_client not around " +
-  //                   "either. This could cause problems");
-  //     }
-  //   }
-  // }
+var clientPath = (function() {
+  var possiblePaths = [
+    './node_modules/.bin/instruments-client.js',
+    './node_modules/appium/node_modules/.bin/instruments-client.js'
+  ];
+  for(var i=0; i<possiblePaths.length; i++){
+    if(fileExists(possiblePaths[i])) {
+      return possiblePaths[i];
+    }
+  }
 })();
 
-var nodePathAppiumConfig = function () {
-  var appiumconfig = '.appiumconfig.json';
-  var module = 'node_modules/appium/';
+console.log('Using instrument client with path: ' + clientPath);
 
-  // Adding "|| echo 'file not found'" in case "cat config file" fails - this
-  // avoids sysExec throwing execption and returns data string here which will
-  // then not parse for node_bin.
-  var data = sysExec("/bin/cat " + appiumconfig + " || echo 'file not found'");
-  if (!data || data === 'file not found') {
-    data = sysExec("/bin/cat " + module + appiumconfig + " || echo 'file not found'");
-    if (!data || data === 'file not found') {
-      console.log("WARN: Could not load " + appiumconfig + " or " + module + appiumconfig);
-      return null;
-    }
-  }
-  try {
-    var jsonobj = JSON.parse(data.toString('utf8'));
-    if (jsonobj.node_bin !== undefined) {
-      return jsonobj.node_bin;
-    }
-    // This setup does not have node_bin configured in appiumconfig.
-  } catch (e) {
-    console.log("WARN: JSON parse of .appiumconfig.json failed: " + e);
-  }
-  return null;
-};
-
-// figure out where node is
-var nodePath = (function () {
-  var path = null;
-  if (typeof settings !== "undefined") {
-    if ('NODE_BIN' in settings) {
-      console.log("Using settings override for NODE_BIN: " + settings.NODE_BIN);
-      return settings.NODE_BIN;
-    }
-  }
-
-  // not in the settings file, so let's try and find it...
-  try {
-    path = sysExec("echo $NODE_BIN");
-    console.log("Found node using $NODE_BIN: " + path);
-  } catch (e) {
-    path = nodePathAppiumConfig();
-    if (path !== null) {
-      console.log("Found node through node_bin in .appiumconfig.json: " + path);
-      return path;
-    }
-    try {
-      path = sysExec('which node');
-      console.log("Found node using `which node`: " + path);
-    } catch (e) {
-      var appScript = [
-          'try'
-        , '  set appiumIsRunning to false'
-        , '  tell application "System Events"'
-        , '    set appiumIsRunning to name of every process contains "Appium"'
-        , '  end tell'
-        , '  if appiumIsRunning then'
-        , '    tell application "Appium" to return node path'
-        , '  end if'
-        , 'end try'
-        , 'return "NULL"'
-        ].join("\n");
-      var appNodeWorked = false;
-      try {
-        path = sysExec("osascript -e '" + appScript + "'");
-        appNodeWorked = path !== "NULL";
-      } catch (e) {}
-      if (!appNodeWorked) {
-        try {
-          path = sysExec("ls /usr/local/bin/node");
-          console.log("Found node at " + path);
-        } catch (e) {
-          try {
-            path = sysExec("ls /opt/local/bin/node");
-            console.log("Found node at " + path);
-          } catch (e) {
-            throw new Error("Could not find node using `which node`, at /usr/" +
-                            "local/bin/node, at /opt/local/bin/node, at " +
-                            "$NODE_BIN, or by querying Appium.app. Where is " +
-                            "it?");
-          }
-        }
-      } else {
-        console.log("Found node in Appium.app");
-      }
-    }
-  }
-  return path;
-})();
-
-var isAppiumApp = (function () {
-  try {
-    return sysExec('echo $Appium_app') !== null;
-  } catch (e) {
-    return false;
-  }
-})();
 
 var sendResultAndGetNext = function (result) {
   curAppiumCmdId++;
   var args = ['-s', '/tmp/instruments_sock'], res
-    , binaryPath = nodePath;
-  if (isAppiumApp) {
-    globalPath = null;
-  }
-  if (globalPath === null) {
-    args.unshift(clientPath);
-  } else {
-    args.unshift(globalPath);
-  }
+    , binaryPath = clientPath;
   if (typeof result !== "undefined") {
     args = args.concat(['-r', JSON.stringify(result)]);
   }
