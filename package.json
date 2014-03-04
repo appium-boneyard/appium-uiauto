@@ -14,7 +14,7 @@
     "url": "https://github.com/appium/appium-uiauto.git"
   },
   "author": "",
-  "license": "LICENCE",
+  "license": "apache-2.0",
   "bugs": {
     "url": "https://github.com/appium/appium-uiauto/issues"
   },
