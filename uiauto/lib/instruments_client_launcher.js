@@ -88,26 +88,96 @@ settings = function () {
 /* exported isVerbose */
 var isVerbose = (typeof settings !== "undefined" && 'verbose' in settings && settings.verbose === 'true');
 
+var guessNodePath = function() {
+  var path = null;
+  // let's try and find it...
+  try {
+    path = sysExec("echo $NODE_BIN");
+    console.log("Found node using $NODE_BIN: " + path);
+  } catch (e) {
+    try {
+      path = sysExec('which node');
+      console.log("Found node using `which node`: " + path);
+    } catch (e) {
+      var appScript = [
+        'try',
+        '  set appiumIsRunning to false',
+        '  tell application "System Events"',
+        '    set appiumIsRunning to name of every process contains "Appium"',
+        '  end tell',
+        '  if appiumIsRunning then',
+        '    tell application "Appium" to return node path',
+        '  end if',
+        'end try',
+        'return "NULL"'
+      ].join("\n");
+      var appNodeWorked = false;
+      try {
+        path = sysExec("osascript -e '" + appScript + "'");
+        appNodeWorked = path !== "NULL";
+      } catch (e) {}
+      if (!appNodeWorked) {
+        try {
+          path = sysExec("ls /usr/local/bin/node");
+          console.log("Found node at " + path);
+        } catch (e) {
+          try {
+            path = sysExec("ls /opt/local/bin/node");
+            console.log("Found node at " + path);
+          } catch (e) {
+            throw new Error("Could not find node using `which node`, at /usr/" +
+              "local/bin/node, at /opt/local/bin/node, at " +
+              "$NODE_BIN, or by querying Appium.app. Where is " +
+              "it?");
+          }
+        }
+      } else {
+        console.log("Found node in Appium.app");
+      }
+    }
+  }
+  return path;
+};
+
 // figure out where instruments client is (relative to where appium is run)
-var clientPath = (function() {
+var getClientPath = function () {
   var possiblePaths = [
     './node_modules/.bin/instruments-client.js',
     './node_modules/appium/node_modules/.bin/instruments-client.js'
   ];
-  for(var i=0; i<possiblePaths.length; i++){
-    if(fileExists(possiblePaths[i])) {
+  for (var i = 0; i < possiblePaths.length; i++) {
+    if (fileExists(possiblePaths[i])) {
       return possiblePaths[i];
     }
   }
-})();
+};
 
+var clientPath = getClientPath();
 console.log('Using instrument client with path: ' + clientPath);
-
 
 var sendResultAndGetNext = function (result) {
   curAppiumCmdId++;
   var args = ['-s', '/tmp/instruments_sock'], res
-    , binaryPath = clientPath;
+    , binaryPath;
+
+  if ((typeof settings !== "undefined") && ('NODE_BIN' in settings)) {
+    console.log("Using settings override for NODE_BIN: " + settings.NODE_BIN);
+    binaryPath = settings.NODE_BIN;
+    args.unshift(clientPath);
+  } else {
+    try {
+      sysExec('/usr/bin/env node -v');
+      binaryPath = clientPath;
+    } catch (err) {
+      console.log(
+        'It looks like node is not setup properly please make sure ' +
+        'the shebang\'/usr/bin/env node\' work or set NODE_BIN in settings.');
+      console.log('Guessing node path.');
+      binaryPath = guessNodePath();
+      args.unshift(clientPath);
+    }
+  }
+  
   if (typeof result !== "undefined") {
     args = args.concat(['-r', JSON.stringify(result)]);
   }
