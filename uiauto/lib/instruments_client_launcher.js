@@ -88,7 +88,29 @@ settings = function () {
 /* exported isVerbose */
 var isVerbose = (typeof settings !== "undefined" && 'verbose' in settings && settings.verbose === 'true');
 
-var guessNodePath = function() {
+var getNodePathFromAppiumApp = function () {
+  var appScript = [
+    'try',
+    '  set appiumIsRunning to false',
+    '  tell application "System Events"',
+    '    set appiumIsRunning to name of every process contains "Appium"',
+    '  end tell',
+    '  if appiumIsRunning then',
+    '    tell application "Appium" to return node path',
+    '  end if',
+    'end try',
+    'return "NULL"'
+  ].join("\n");
+  var path = null;
+  try {
+    path = sysExec("osascript -e '" + appScript + "'");
+    if (path === "NULL") path = null;
+  } catch (e) {}
+  if (path) console.log("Found node in Appium.app");
+  return path;
+};
+
+var guessNodePath = function () {
   var path = null;
   // let's try and find it...
   try {
@@ -99,40 +121,19 @@ var guessNodePath = function() {
       path = sysExec('which node');
       console.log("Found node using `which node`: " + path);
     } catch (e) {
-      var appScript = [
-        'try',
-        '  set appiumIsRunning to false',
-        '  tell application "System Events"',
-        '    set appiumIsRunning to name of every process contains "Appium"',
-        '  end tell',
-        '  if appiumIsRunning then',
-        '    tell application "Appium" to return node path',
-        '  end if',
-        'end try',
-        'return "NULL"'
-      ].join("\n");
-      var appNodeWorked = false;
       try {
-        path = sysExec("osascript -e '" + appScript + "'");
-        appNodeWorked = path !== "NULL";
-      } catch (e) {}
-      if (!appNodeWorked) {
+        path = sysExec("ls /usr/local/bin/node");
+        console.log("Found node at " + path);
+      } catch (e) {
         try {
-          path = sysExec("ls /usr/local/bin/node");
+          path = sysExec("ls /opt/local/bin/node");
           console.log("Found node at " + path);
         } catch (e) {
-          try {
-            path = sysExec("ls /opt/local/bin/node");
-            console.log("Found node at " + path);
-          } catch (e) {
-            throw new Error("Could not find node using `which node`, at /usr/" +
-              "local/bin/node, at /opt/local/bin/node, at " +
-              "$NODE_BIN, or by querying Appium.app. Where is " +
-              "it?");
-          }
+          throw new Error("Could not find node using `which node`, at /usr/" +
+            "local/bin/node, at /opt/local/bin/node, at " +
+            "$NODE_BIN, or by querying Appium.app. Where is " +
+            "it?");
         }
-      } else {
-        console.log("Found node in Appium.app");
       }
     }
   }
@@ -169,11 +170,14 @@ var sendResultAndGetNext = function (result) {
       sysExec('/usr/bin/env node -v');
       binaryPath = clientPath;
     } catch (err) {
-      console.log(
-        'It looks like node is not setup properly please make sure ' +
-        'the shebang\'/usr/bin/env node\' work or set NODE_BIN in settings.');
-      console.log('Guessing node path.');
-      binaryPath = guessNodePath();
+      var binaryPath = getNodePathFromAppiumApp();
+      if (!binaryPath) {
+        console.log(
+          'It looks like node is not correctly setup please make sure ' +
+          'the shebang\'/usr/bin/env node\' works or set NODE_BIN in settings.');
+        console.log('Guessing node path.');
+        binaryPath = guessNodePath();
+      }
       args.unshift(clientPath);
     }
   }
