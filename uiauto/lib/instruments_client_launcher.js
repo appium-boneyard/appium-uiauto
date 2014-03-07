@@ -191,9 +191,12 @@ var sendResultAndGetNext = function (result) {
     console.log(e.name + " error getting command " + curAppiumCmdId + ": " + e.message);
     return null;
   }
-
+  var cmd = binaryPath + " " + args.join(" ");
+  if (!res) {
+    console.log("Instruments client (" + cmd + ") exited with null res");
+    return null;
+  }
   if (res.exitCode !== 0) {
-    var cmd = binaryPath + " " + args.join(" ");
     console.log("Instruments client (" + cmd + ") exited with " + res.exitCode +
                 ", here's stderr:");
     console.log(res.stderr);
