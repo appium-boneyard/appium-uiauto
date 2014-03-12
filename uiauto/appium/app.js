@@ -340,13 +340,8 @@ $.extend(au, {
   }
 
 , getElementByName: function (name, ctx) {
-    var selector = ['#', name].join('')
-      , elems;
-    if (typeof ctx !== 'undefined') {
-      elems = this.lookup(selector, ctx);
-    } else {
-      elems = this.lookup(selector);
-    }
+    var selector = ['#', name].join('');
+    var elems = this.lookup(selector, ctx);
 
     if (elems.length > 0) {
       var el = elems[0];
@@ -407,13 +402,8 @@ $.extend(au, {
   }
 
 , getElementsByName: function (name, ctx) {
-    var selector = ['#', name].join('')
-      , elems;
-    if (typeof ctx !== 'undefined') {
-      elems = this.lookup(selector, ctx);
-    } else {
-      elems = this.lookup(selector);
-    }
+    var selector = ['#', name].join('');
+    var elems = this.lookup(selector, ctx);
 
     return this._returnElems(elems);
   }
@@ -441,25 +431,13 @@ $.extend(au, {
 , getElementsByType: function (type, ctx) {
     var selector = this.convertSelector(type);
 
-    var elems = [];
-
-    if (typeof ctx !== 'undefined') {
-      elems = this.lookup(selector, ctx);
-    } else {
-      elems = this.lookup(selector);
-    }
+    var elems = this.lookup(selector, ctx);
 
     return this._returnElems(elems);
   }
 
 , getElementByType: function (type, ctx) {
-    var results = [];
-
-    if (typeof ctx !== 'undefined') {
-      results = this.getElementsByType(type, ctx);
-    } else {
-      results = this.getElementsByType(type);
-    }
+    var results = this.getElementsByType(type, ctx);
 
     if (results.value.length < 1) {
       return {
@@ -546,13 +524,8 @@ $.extend(au, {
   }
 
 , getElementByXpath: function (xpath, ctx) {
-    var results = [];
 
-    if (typeof ctx !== 'undefined') {
-      results = this.getElementsByXpath(xpath, ctx);
-    } else {
-      results = this.getElementsByXpath(xpath);
-    }
+    var results = this.getElementsByXpath(xpath, ctx);
 
     if (results.value === null || results.value.length < 1) {
       return {
