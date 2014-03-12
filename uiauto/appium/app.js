@@ -295,31 +295,31 @@ $.extend(au, {
   // Element lookup functions
 
 , lookup: function (selector, ctx) {
-    if (typeof selector === 'string') {
-      var _ctx = this.mainApp()
-        , elems = [];
-
-      if (typeof ctx === 'string') {
-        _ctx = this.cache[ctx];
-      } else if (typeof ctx !== 'undefined') {
-        _ctx = ctx;
-      }
-
-      this.target().pushTimeout(0);
-      if (selector === 'alert') {
-        var alert = this.mainApp().alert();
-        if (alert) {
-          elems = $(alert);
-        }
-      } else {
-        elems = $(selector, _ctx);
-      }
-      this.target().popTimeout();
-
-      return elems;
+    if (typeof selector !== 'string') {
+      return null
     }
 
-    return null;
+    var _ctx = this.mainApp()
+      , elems = [];
+
+    if (typeof ctx === 'string') {
+      _ctx = this.cache[ctx];
+    } else if (typeof ctx !== 'undefined') {
+      _ctx = ctx;
+    }
+
+    this.target().pushTimeout(0);
+    if (selector === 'alert') {
+      var alert = this.mainApp().alert();
+      if (alert) {
+        elems = $(alert);
+      }
+    } else {
+      elems = $(selector, _ctx);
+    }
+    this.target().popTimeout();
+
+    return elems;
   }
 
 , getElement: function (name) {
