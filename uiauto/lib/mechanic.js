@@ -86,13 +86,29 @@ var mechanic = (function () {
 
     return foundEls;
   };
-  UIAElement.prototype.getElementsByType = function (type) {
-    return $.map(this.elements(), function (el) {
-      var matches = el.getElementsByType(type);
-      if (el.isType(type)) matches.unshift(el);
-      return matches;
+
+  function _getElementsByType(current, type, foundEls, isParent) {
+    if (!isParent && current.isType(type)) {
+      var isDuplicate = false;
+      if (type === 'textfield') {
+        // fixing duplicated text fields
+        $.each(current.elements(), function (idx, child) {
+          isDuplicate = isDuplicate || child.isType(type) && child.name() === current.name();
+        });
+      }
+      if (!isDuplicate) foundEls.push(current);
+    }
+    $.each(current.elements(), function (idx, child) {
+      _getElementsByType(child, type, foundEls, false);
     });
+  }
+
+  UIAElement.prototype.getElementsByType = function (type) {
+    var foundEls = [];
+    _getElementsByType(this, type, foundEls, true);
+    return foundEls;
   };
+
   UIAElement.prototype.isType = function (type) {
     var thisType = this.toString().split(" ")[1];
     thisType = thisType.substr(0, thisType.length - 1);
