@@ -359,9 +359,24 @@ $.extend(au, {
     }
   }
 
+, _returnFirstElem: function (elems) {
+  if (elems.length > 0) {
+    var el = elems[0];
+    var elid = this.getId(el);
+
+    return {
+      status: codes.Success.code,
+      value: {'ELEMENT': elid }
+    };
+  } else {
+    return {
+      status: codes.NoSuchElement.code,
+      value: codes.NoSuchElement.summary
+    };
+  }
+}
 , _returnElems: function (elems) {
     var results = [];
-
     elems.each(function (e, el) {
       var elid = this.getId(el);
       results.push({ELEMENT: elid});
@@ -562,6 +577,39 @@ $.extend(au, {
     var seconds = parseInt(secs, 10);
     return this.target().deactivateAppForDuration(seconds);
   }
+, getElementByUIAutomation: function (selectorCode, ctx) {
+    var elems = this._getElementsByUIAutomation(selectorCode, ctx);
+    return this._returnFirstElem($(elems));
+  }
+, getElementsByUIAutomation: function (selectorCode, ctx) {
+    var elems = this._getElementsByUIAutomation(selectorCode, ctx);
+    return this._returnElems($(elems));
+}
+, _getElementsByUIAutomation: function (selectorCode, ctx) {
+  var rootElement = this.mainWindow();
+
+  if (typeof ctx === 'string') {
+    rootElement = this.cache[ctx];
+  } else if (typeof ctx !== 'undefined') {
+    rootElement = ctx;
+  }
+
+  //There may not be a '.' at the beginning of the string, add for convenience
+  if (selectorCode[0] !== '.') {
+    selectorCode = '.' + selectorCode;
+  }
+
+  //convert the string we were given into the element we want
+  var elems = eval("rootElement" + selectorCode);
+  if (elems instanceof UIAElementArray) {
+    //tricky: UIAutomation returns UIElementArray objects, not standard js array. Mechanic.js expects objects of type Array
+    elems = elems.toArray();
+  } else {
+    return [elems]
+  }
+
+  return elems;
+}
 
   // Gesture functions
 
