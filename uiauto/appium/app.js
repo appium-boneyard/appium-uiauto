@@ -343,20 +343,7 @@ $.extend(au, {
     var selector = ['#', name].join('');
     var elems = this.lookup(selector, ctx);
 
-    if (elems.length > 0) {
-      var el = elems[0];
-      var elid = this.getId(el);
-
-      return {
-        status: codes.Success.code,
-        value: {'ELEMENT': elid }
-      };
-    } else {
-      return {
-        status: codes.NoSuchElement.code,
-        value: codes.NoSuchElement.summary
-      };
-    }
+    return this._returnFirstElement($(elems));
   }
 
 , _returnFirstElem: function (elems) {
@@ -444,28 +431,23 @@ $.extend(au, {
   }
 
 , getElementsByType: function (type, ctx) {
-    var selector = this.convertSelector(type);
+    var elems = this._getElementsByType(type, ctx);
 
-    var elems = this.lookup(selector, ctx);
-
-    return this._returnElems(elems);
+    return this._returnElems($(elems));
   }
 
 , getElementByType: function (type, ctx) {
-    var results = this.getElementsByType(type, ctx);
+    var elems = this._getElementsByType(type, ctx);
 
-    if (results.value.length < 1) {
-      return {
-        status: codes.NoSuchElement.code,
-        value: null
-      };
-    } else {
-      return {
-        status: codes.Success.code,
-        value: results.value[0]
-      };
-    }
+    return this._returnFirstElem($(elems));
   }
+
+, _getElementsByType: function (type, ctx) {
+  var selector = this.convertSelector(type);
+  var elems = this.lookup(selector, ctx);
+
+  return elems;
+}
 
 , _getElementsByXpath: function (xpath, ctx) {
     var _ctx = this.mainApp()
