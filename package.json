@@ -1,6 +1,6 @@
 {
   "name": "appium-uiauto",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "appium uiauto ios driver",
   "main": "index.js",
   "bin": {
