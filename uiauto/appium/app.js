@@ -343,7 +343,7 @@ $.extend(au, {
     var selector = ['#', name].join('');
     var elems = this.lookup(selector, ctx);
 
-    return this._returnFirstElement($(elems));
+    return this._returnFirstElem($(elems));
   }
 
 , _returnFirstElem: function (elems) {
