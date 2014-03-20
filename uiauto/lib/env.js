@@ -31,8 +31,7 @@ var user = null,
   var cmds = [
     'whoami',
     'echo $HOME | cut -d / -f3',
-    'ls -d ~ | cut -d / -f3',
-    'ls /opt/local/bin/node'
+    'ls -d ~ | cut -d / -f3'
   ];
   for (var i = 0; i < cmds.length; i++) {
     user = getUserFromCommand(cmds[i]);
