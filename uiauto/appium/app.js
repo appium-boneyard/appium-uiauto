@@ -296,7 +296,7 @@ $.extend(au, {
 
 , lookup: function (selector, ctx) {
     if (typeof selector !== 'string') {
-      return null
+      return null;
     }
 
     var _ctx = this.mainApp()
@@ -347,21 +347,22 @@ $.extend(au, {
   }
 
 , _returnFirstElem: function (elems) {
-  if (elems.length > 0) {
-    var el = elems[0];
-    var elid = this.getId(el);
+    if (elems.length > 0) {
+      var el = elems[0];
+      var elid = this.getId(el);
 
-    return {
-      status: codes.Success.code,
-      value: {'ELEMENT': elid }
-    };
-  } else {
-    return {
-      status: codes.NoSuchElement.code,
-      value: codes.NoSuchElement.summary
-    };
+      return {
+        status: codes.Success.code,
+        value: {'ELEMENT': elid }
+      };
+    } else {
+      return {
+        status: codes.NoSuchElement.code,
+        value: codes.NoSuchElement.summary
+      };
+    }
   }
-}
+
 , _returnElems: function (elems) {
     var results = [];
     elems.each(function (e, el) {
@@ -443,11 +444,11 @@ $.extend(au, {
   }
 
 , _getElementsByType: function (type, ctx) {
-  var selector = this.convertSelector(type);
-  var elems = this.lookup(selector, ctx);
+    var selector = this.convertSelector(type);
+    var elems = this.lookup(selector, ctx);
 
-  return elems;
-}
+    return elems;
+  }
 
 , _getElementsByXpath: function (xpath, ctx) {
     var _ctx = this.mainApp()
@@ -566,32 +567,32 @@ $.extend(au, {
 , getElementsByUIAutomation: function (selectorCode, ctx) {
     var elems = this._getElementsByUIAutomation(selectorCode, ctx);
     return this._returnElems($(elems));
-}
+  }
 , _getElementsByUIAutomation: function (selectorCode, ctx) {
-  var rootElement = this.mainWindow();
+    var rootElement = this.mainWindow();
 
-  if (typeof ctx === 'string') {
-    rootElement = this.cache[ctx];
-  } else if (typeof ctx !== 'undefined') {
-    rootElement = ctx;
+    if (typeof ctx === 'string') {
+      rootElement = this.cache[ctx];
+    } else if (typeof ctx !== 'undefined') {
+      rootElement = ctx;
+    }
+
+    //There may not be a '.' at the beginning of the string, add for convenience
+    if (selectorCode[0] !== '.') {
+      selectorCode = '.' + selectorCode;
+    }
+
+    //convert the string we were given into the element we want
+    var elems = eval("rootElement" + selectorCode);
+    if (elems instanceof UIAElementArray) {
+      //tricky: UIAutomation returns UIElementArray objects, not standard js array. Mechanic.js expects objects of type Array
+      elems = elems.toArray();
+    } else {
+      return [elems];
+    }
+
+    return elems;
   }
-
-  //There may not be a '.' at the beginning of the string, add for convenience
-  if (selectorCode[0] !== '.') {
-    selectorCode = '.' + selectorCode;
-  }
-
-  //convert the string we were given into the element we want
-  var elems = eval("rootElement" + selectorCode);
-  if (elems instanceof UIAElementArray) {
-    //tricky: UIAutomation returns UIElementArray objects, not standard js array. Mechanic.js expects objects of type Array
-    elems = elems.toArray();
-  } else {
-    return [elems]
-  }
-
-  return elems;
-}
 
   // Gesture functions
 
