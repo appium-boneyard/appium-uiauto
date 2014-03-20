@@ -38,7 +38,7 @@ var user = null,
     if (user) break;
   }
   if (!user) console.error("Could not get user");
-})(sysExec, dirExists);
+})();
 
 
 // retrieving settings + isVerbose
