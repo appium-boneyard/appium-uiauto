@@ -1,5 +1,6 @@
-var au;
+/* globals codes, $ */
 
+var au;
 if (typeof au === "undefined") {
   au = {};
 }

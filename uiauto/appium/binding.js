@@ -1,3 +1,5 @@
+/* globals $ */
+
 var au;
 
 if (typeof au === "undefined") {
