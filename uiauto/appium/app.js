@@ -1,5 +1,6 @@
-var au;
+/* globals codes, $ */
 
+var au;
 if (typeof au === "undefined") {
   au = {};
 }
@@ -569,6 +570,7 @@ $.extend(au, {
     return this._returnElems($(elems));
   }
 , _getElementsByUIAutomation: function (selectorCode, ctx) {
+    /* jshint evil: true */
     var rootElement = this.mainWindow();
 
     if (typeof ctx === 'string') {

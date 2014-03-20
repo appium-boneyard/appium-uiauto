@@ -1,3 +1,5 @@
+/* globals $, au, codes */
+
 UIAElementNil.prototype.type = function () {
   return "UIAElementNil";
 };

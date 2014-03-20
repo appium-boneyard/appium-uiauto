@@ -1,3 +1,5 @@
+/* globals isVerbose */
+
 /*
  * mechanic.js UIAutomation Library
  * http://cozykozy.com/pages/mechanicjs
