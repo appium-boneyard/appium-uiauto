@@ -18,9 +18,9 @@
   };
 
   UIATarget.onAlert = function (alert) {
-    if (alert.name() && alert.name().indexOf("attempting to open a pop-up") !== -1) {
+    if (alert.name() && alert.name().indexOf("attempting to open a pop-up") !== -1 && alert.buttons().length > 0) {
       alert.defaultButton().tap();
-    } else if (bootstrapSettings.autoAcceptAlerts) {
+    } else if (bootstrapSettings.autoAcceptAlerts && alert.buttons().length > 0) {
       alert.defaultButton().tap();
     }
     return true;
