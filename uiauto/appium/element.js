@@ -145,29 +145,35 @@ UIAElement.prototype.matchesBy = function (tagName, text) {
 UIAElement.prototype.getTree = function () {
   var target = UIATarget.localTarget();
   target.pushTimeout(0);
-  var getTree = function (element) {
+  var getTree = function (element, elementIndex, parentPath) {
+    var curPath = parentPath + "/" + elementIndex;
     var subtree = {
-      name: element.name()
-    , type: element.type()
-    , label: element.label()
-    , value: element.value()
+      "@": {
+        name: element.name()
+      , label: element.label()
+      , value: element.value()
+      , dom: typeof element.dom === "function" ? element.dom() : null
+      , enabled: element.isEnabled() ? true : false
+      , valid: element.isValid() ? true : false
+      , visible: element.isVisible() === 1 ? true : false
+      , hint: element.hint()
+      , path: curPath
+      }
     , rect: element.rect()
-    , dom: typeof element.dom === "function" ? element.dom() : null
-    , enabled: element.isEnabled() ? true : false
-    , valid: element.isValid() ? true : false
-    , visible: element.isVisible() === 1 ? true : false
     , children: []
-    , hint: element.hint()
     };
     var children = element.elements();
     var numChildren = children.length;
     for (var i = 0; i < numChildren; i++) {
       var child = children[i];
-      subtree.children.push(getTree(child));
+      subtree.children.push(getTree(child, i, curPath));
     }
-    return subtree;
+    var elType = element.type();
+    var obj = {};
+    obj[elType] = subtree;
+    return obj;
   };
-  var tree = getTree(this);
+  var tree = getTree(this, 0, "");
   target.popTimeout();
   return tree;
 };
