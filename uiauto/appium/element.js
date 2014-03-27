@@ -142,7 +142,7 @@ UIAElement.prototype.matchesBy = function (tagName, text) {
   return value === text;
 };
 
-UIAElement.prototype.getTree = function () {
+UIAElement.prototype.getTreeForXML = function () {
   var target = UIATarget.localTarget();
   target.pushTimeout(0);
   var getTree = function (element, elementIndex, parentPath) {
@@ -179,9 +179,38 @@ UIAElement.prototype.getTree = function () {
   };
   var tree = getTree(this, 0, "");
   target.popTimeout();
-  return tree;
+  return JSON.stringify(tree);
 };
 
+UIAElement.prototype.getTree = function () {
+  var target = UIATarget.localTarget();
+  target.pushTimeout(0);
+  var getTree = function (element) {
+    var subtree = {
+      name: element.name()
+    , type: element.type()
+    , label: element.label()
+    , value: element.value()
+    , rect: element.rect()
+    , dom: typeof element.dom === "function" ? element.dom() : null
+    , enabled: element.isEnabled() ? true : false
+    , valid: element.isValid() ? true : false
+    , visible: element.isVisible() === 1 ? true : false
+    , children: []
+    , hint: element.hint()
+    };
+    var children = element.elements();
+    var numChildren = children.length;
+    for (var i = 0; i < numChildren; i++) {
+      var child = children[i];
+      subtree.children.push(getTree(child));
+    }
+    return subtree;
+  };
+  var tree = getTree(this);
+  target.popTimeout();
+  return tree;
+};
 
 UIAElement.prototype.getPageSource = function () {
   return JSON.stringify(this.getTree());
