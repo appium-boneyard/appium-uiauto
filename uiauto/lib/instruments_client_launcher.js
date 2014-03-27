@@ -24,13 +24,14 @@ var sendResultAndGetNext,
   sendResultAndGetNext = function (result) {
     curAppiumCmdId++;
     var args = [clientPath, '-s', '/tmp/instruments_sock'], res;
-    
+
     if (typeof result !== "undefined") {
       args = args.concat(['-r', JSON.stringify(result)]);
     }
     var cmd = nodePath + " " + args.join(" ");
+    var cmdLog = cmd.slice(0, 300);
     try {
-      console.log("Running command #" + curAppiumCmdId + ": " + cmd);
+      console.log("Running command #" + curAppiumCmdId + ": " + cmdLog);
       res = system.performTaskWithPathArgumentsTimeout(nodePath, args, waitForDataTimeout);
     } catch (e) {
       console.log(e.name + " error getting command " + curAppiumCmdId + ": " + e.message);

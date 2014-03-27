@@ -548,6 +548,74 @@ $.extend(au, {
     }
   }
 
+, _getElementByIndexPath: function (path, ctx) {
+    if (typeof ctx === "undefined") {
+      ctx = this.mainApp();
+    }
+    var pathRegex = new RegExp("^/[0-9]+(/[0-9]+)*$");
+    if (!pathRegex.test(path)) {
+      throw new Error("Path " + path + " was not a valid index path");
+    }
+    // Throw away the empty path and the initial /X since that refers to ctx
+    var pathSet = path.split("/").slice(2);
+    var foundElement = ctx;
+    for (var i = 0; i < pathSet.length; i++) {
+      foundElement = foundElement.elements()[pathSet[i]];
+      if (foundElement.isNil()) {
+        throw new Error("Could not find element with path " + path);
+      }
+    }
+    return foundElement;
+  }
+
+, _handleIndexPathError: function (err, many) {
+    if (err.message.indexOf("Could not find") !== -1) {
+      return {
+        status: many ?
+                codes.StaleElementReference.code :
+                codes.NoSuchElement.code,
+        value: err.message
+      };
+    } else {
+      return {
+        status: codes.UnknownError.code,
+        value: err.message
+      };
+    }
+  }
+
+, getElementByIndexPath: function (path, ctx) {
+    this.target().pushTimeout(0);
+    var ret;
+    try {
+      var elem = this._getElementByIndexPath(path, ctx);
+      ret = this._returnFirstElem($([elem]));
+    } catch (err) {
+      ret = this._handleIndexPathError(err, false);
+    }
+    this.target().popTimeout();
+    return ret;
+  }
+
+, getElementsByIndexPaths: function (paths, ctx) {
+    var elems = [];
+    var ret = null;
+    this.target().pushTimeout(0);
+    for (var i = 0; i < paths.length; i++) {
+      try {
+        elems.push(this._getElementByIndexPath(paths[i], ctx));
+      } catch (err) {
+        ret = this._handleIndexPathError(err, true);
+        break;
+      }
+    }
+    if (ret === null) {
+      ret = this._returnElems($(elems));
+    }
+    this.target().popTimeout();
+    return ret;
+  }
+
 , getActiveElement: function () {
     return $(this.mainWindow()).getActiveElement();
   }
