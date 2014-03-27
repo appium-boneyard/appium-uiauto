@@ -147,6 +147,7 @@ UIAElement.prototype.getTree = function () {
   target.pushTimeout(0);
   var getTree = function (element, elementIndex, parentPath) {
     var curPath = parentPath + "/" + elementIndex;
+    var rect = element.rect();
     var subtree = {
       "@": {
         name: element.name()
@@ -158,15 +159,18 @@ UIAElement.prototype.getTree = function () {
       , visible: element.isVisible() === 1 ? true : false
       , hint: element.hint()
       , path: curPath
+      , x: rect.origin.x
+      , y: rect.origin.y
+      , width: rect.size.width
+      , height: rect.size.height
       }
-    , rect: element.rect()
-    , children: []
+    , ">": []
     };
     var children = element.elements();
     var numChildren = children.length;
     for (var i = 0; i < numChildren; i++) {
       var child = children[i];
-      subtree.children.push(getTree(child, i, curPath));
+      subtree[">"].push(getTree(child, i, curPath));
     }
     var elType = element.type();
     var obj = {};

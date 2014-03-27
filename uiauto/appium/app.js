@@ -561,7 +561,7 @@ $.extend(au, {
     var foundElement = ctx;
     for (var i = 0; i < pathSet.length; i++) {
       foundElement = foundElement.elements()[pathSet[i]];
-      if (foundElement.type() === "UIAElementNil") {
+      if (foundElement.isNil()) {
         throw new Error("Could not find element with path " + path);
       }
     }
@@ -612,7 +612,7 @@ $.extend(au, {
     if (ret === null) {
       ret = this._returnElems($(elems));
     }
-    this.popTimeout();
+    this.target().popTimeout();
     return ret;
   }
 
