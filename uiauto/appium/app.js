@@ -325,6 +325,9 @@ $.extend(au, {
 
 , getElement: function (name) {
     if (typeof this.cache[name] !== 'undefined') {
+      if (this.cache[name].isNil()) {
+        throw new Error(codes.StaleElementReference.code);
+      }
       return this.cache[name];
     }
 
