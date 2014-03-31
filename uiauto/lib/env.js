@@ -1,4 +1,5 @@
 /* globals sysExec, dirExists, fileExists */
+/* exported WAIT_FOR_DATA_TIMEOUT, system, target, mainWindow, mainWindow, wd_frame */
 
 // automation globals
 var system = UIATarget.localTarget().host();
@@ -7,12 +8,13 @@ var mainWindow = target.frontMostApp().mainWindow();
 var wd_frame = target.frontMostApp();
 
 
-/* local env */
-/* exported system, target, mainWindow, mainWindow, wd_frame */
+// local environment
 var user = null,
     settings = {},
     isVerbose = false,
-    nodePath;
+    nodePath,
+    instrumentsClientPath,
+    WAIT_FOR_DATA_TIMEOUT = 3600;
 
 (function () {
   console.start('Bootstrapping uiauto');
@@ -145,8 +147,31 @@ var user = null,
       }
     }
     if (!nodePath) {
-      throw new Error("Could not find node, Where is it?");
+      throw new Error("Could not find node, where is it?");
     }
     console.start("Using node at: " + nodePath);
   })();
+
+
+  // figure out where instruments client is (relative to where appium is run)
+  (function () {
+    var getClientPath = function () {
+      var possiblePaths = [
+        './node_modules/.bin/instruments-client.js',
+        './node_modules/appium/node_modules/.bin/instruments-client.js'
+      ];
+      for (var i = 0; i < possiblePaths.length; i++) {
+        if (fileExists(possiblePaths[i])) {
+          return possiblePaths[i];
+        }
+      }
+    };
+
+    instrumentsClientPath = getClientPath();
+    if (!instrumentsClientPath) {
+      throw new Error("Could not find instruments clientPath, where is it?");
+    }
+    console.log('Using instrument client at: ' + instrumentsClientPath);
+  })();
+
 })();
