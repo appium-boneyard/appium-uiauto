@@ -1,29 +1,15 @@
-/* globals system, nodePath, fileExists */
+/* globals system, nodePath , instrumentsClientPath, 
+           WAIT_FOR_DATA_TIMEOUT 
+*/
 
 var sendResultAndGetNext,
     getFirstCommand,
     curAppiumCmdId = -1;
 
 (function () {
-  var waitForDataTimeout = 3600;
-  // figure out where instruments client is (relative to where appium is run)
-  var getClientPath = function () {
-    var possiblePaths = [
-      './node_modules/.bin/instruments-client.js',
-      './node_modules/appium/node_modules/.bin/instruments-client.js'
-    ];
-    for (var i = 0; i < possiblePaths.length; i++) {
-      if (fileExists(possiblePaths[i])) {
-        return possiblePaths[i];
-      }
-    }
-  };
-  var clientPath = getClientPath();
-  console.log('Using instrument client with path: ' + clientPath);
-
   sendResultAndGetNext = function (result) {
     curAppiumCmdId++;
-    var args = [clientPath, '-s', '/tmp/instruments_sock'], res;
+    var args = [instrumentsClientPath, '-s', '/tmp/instruments_sock'], res;
 
     if (typeof result !== "undefined") {
       args = args.concat(['-r', JSON.stringify(result)]);
@@ -32,7 +18,7 @@ var sendResultAndGetNext,
     var cmdLog = cmd.slice(0, 300);
     try {
       console.log("Running command #" + curAppiumCmdId + ": " + cmdLog);
-      res = system.performTaskWithPathArgumentsTimeout(nodePath, args, waitForDataTimeout);
+      res = system.performTaskWithPathArgumentsTimeout(nodePath, args, WAIT_FOR_DATA_TIMEOUT);
     } catch (e) {
       console.log(e.name + " error getting command " + curAppiumCmdId + ": " + e.message);
       return null;
