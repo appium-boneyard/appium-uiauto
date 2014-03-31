@@ -44,7 +44,18 @@
                       configParts[1]);
         } else {
           /* jshint evil:true */
-          result = eval(cmd);
+          try {
+            result = eval(cmd);
+          } catch (possStaleEl) {
+            if (possStaleEl.message === codes.StaleElementReference.code) {
+              result = {
+                status: codes.StaleElementReference.code,
+                value: codes.StaleElementReference.summary
+              };
+            } else {
+              throw possStaleEl;
+            }
+          }
         }
       } catch (e) {
         result = {
