@@ -900,14 +900,27 @@ $.extend(au, {
   }
 
 , hideKeyboard: function (keyName) {
-    try {
-      var keys = this.keyboard().buttons();
-      keys[keyName].tap();
-    } catch (e) {
+    if (keyName) {
+      console.log("Hiding keyboard with keyName " + keyName);
+      try {
+        var keys = this.keyboard().buttons();
+        keys[keyName].tap();
+      } catch (e) {
+        return {
+          status: codes.NoSuchElement.code
+        , value: "Could not find the '" + keyName + "' button, " +
+                 "you're on your own for closing it!"
+        };
+      }
+    } else if (!au.mainApp().keyboard().isNil()) {
+      console.log("Hiding keyboard using default method");
+      var startY = au.mainApp().keyboard().rect().origin.y - 10;
+      var endY = au.mainWindow().rect().size.height - 10;
+      au.flickApp(0, startY, 0, endY);
+    } else {
       return {
         status: codes.NoSuchElement.code
-      , value: "Could not find the '" + keyName + "' button, " +
-               "you're on your own for closing it!"
+      , value: "The keyboard was not present, not closing it"
       };
     }
   }
