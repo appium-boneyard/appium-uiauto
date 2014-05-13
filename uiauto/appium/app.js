@@ -6,6 +6,16 @@ if (typeof au === "undefined") {
 }
 
 UIAElement.prototype.getFirstWithPredicateWeighted = function (predicate) {
+  var elems = this.getElementsWithPredicateWeighted(predicate);
+  return au._returnFirstElem($(elems));
+};
+
+UIAElement.prototype.getAllWithPredicateWeighted = function (predicate) {
+  var elems = this.getElementsWithPredicateWeighted(predicate);
+  return au._returnElems($(elems));
+};
+
+UIAElement.prototype.getElementsWithPredicateWeighted = function (predicate) {
   var target = UIATarget.localTarget();
   target.pushTimeout(0);
   var search = predicate;
@@ -20,6 +30,7 @@ UIAElement.prototype.getFirstWithPredicateWeighted = function (predicate) {
   var searchElements = function (element) {
     var results = element.secureTextFields().withPredicate(search);
     var children = element.elements();
+    var allElements = [];
     if (isNil(results)) {
       results = element.textFields().withPredicate(search);
       if (isNil(results)) {
@@ -35,7 +46,7 @@ UIAElement.prototype.getFirstWithPredicateWeighted = function (predicate) {
       if (tmp.type() !== 'UIAElementNil') {
         result = tmp;
         if (tmp.isVisible() === 1) {
-          return tmp;
+          allElements.push(result);
         }
       }
     }
@@ -43,26 +54,21 @@ UIAElement.prototype.getFirstWithPredicateWeighted = function (predicate) {
     for (var a = 0, len = children.length; a < len; a++) {
       searchElements(children[a]);
       if (result.type() !== 'UIAElementNil' && result.isVisible() === 1) {
-        return result;
+        allElements.push(result);
       }
     }
 
-    return result;
+    return allElements;
   };
-  var element = searchElements(this);
-  target.popTimeout();
-
-  if (element.type() === 'UIAElementNil') {
-    return {
-      status: 7,
-      value: {'message': 'An element could not be located on the page using the given search parameters.'}
-    };
+  var elements = searchElements(this);
+  var newElements = [];
+  for (var i = 0; i < elements.length; i++) {
+    if (newElements.indexOf(elements[i]) === -1) {
+      newElements.push(elements[i]);
+    }
   }
-
-  return {
-    status: 0,
-    value: {ELEMENT: au.getId(element)}
-  };
+  target.popTimeout();
+  return newElements;
 };
 
 UIAElement.prototype.getFirstWithPredicate = function (predicate) {
@@ -348,6 +354,32 @@ $.extend(au, {
     var elems = this.lookup(selector, ctx);
 
     return this._returnFirstElem($(elems));
+  }
+
+, _getIdSearchPredicate: function (sel, exact) {
+    if (exact) {
+      return "name == '" + sel + "' || label == '" + sel + "' || value == '" +
+        sel + "'";
+    } else {
+      return "name contains[c] '" + sel + "' || label contains[c] '" + sel +
+        "' || value contains[c] '" + sel + "'";
+    }
+  }
+
+, getElementById: function (sel) {
+    var exactPred = this._getIdSearchPredicate(sel, true);
+    var exact = this.mainApp().getFirstWithPredicateWeighted(exactPred);
+    if (exact && exact.status === 0) {
+      return exact;
+    } else {
+      var pred = this._getIdSearchPredicate(sel, false);
+      return this.mainApp().getFirstWithPredicateWeighted(pred);
+    }
+  }
+
+, getElementsById: function (sel) {
+    var pred = this._getIdSearchPredicate(sel, false);
+    return this.mainApp().getAllWithPredicateWeighted(pred);
   }
 
 , _returnFirstElem: function (elems) {
