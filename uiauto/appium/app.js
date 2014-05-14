@@ -657,14 +657,14 @@ $.extend(au, {
 
     //convert the string we were given into the element we want
     var elems = eval("rootElement" + selectorCode);
-    if (elems instanceof UIAElementArray) {
+    if (elems instanceof UIAElementNil) {
+      return [];
+    } else if (elems instanceof UIAElementArray) {
       //tricky: UIAutomation returns UIElementArray objects, not standard js array. Mechanic.js expects objects of type Array
-      elems = elems.toArray();
+      return  elems.toArray();
     } else {
       return [elems];
     }
-
-    return elems;
   }
 
   // Gesture functions
