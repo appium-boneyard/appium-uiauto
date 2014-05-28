@@ -361,8 +361,14 @@ $.extend(au, {
       return "name == '" + sel + "' || label == '" + sel + "' || value == '" +
         sel + "'";
     } else {
-      return "name contains[c] '" + sel + "' || label contains[c] '" + sel +
-        "' || value contains[c] '" + sel + "'";
+      // Note that we don't want to include 'value' in this search. Even
+      // though the documentation says the 'value' function on UIAElement
+      // returns a string, on the backend it can sometimes be a number
+      // (e.g. 0 or 1 for a switch). If this happens, UIAutomation will
+      // throw an exception since predicate keywords like CONTAINS and LIKE can
+      // only be performed on a collection/string.
+      return "name contains[c] '" + sel + "' || label contains[c] '" + sel
+        + "'";
     }
   }
 
