@@ -212,6 +212,77 @@ UIAElement.prototype.getTree = function () {
   return tree;
 };
 
+UIAElement.prototype.getFirstWithPredicateWeighted = function (predicate) {
+  var weighting = [
+      'secureTextFields'
+    , 'textFields'
+    , 'buttons'
+    , 'elements'
+  ];
+  var elems = this._elementOrElementsWithPredicateWeighted(predicate,
+                weighting, true);
+  return au._returnFirstElem($(elems));
+};
+
+UIAElement.prototype.getFirstWithPredicate = function (predicate) {
+  var weighting = ['elements'];
+  var elems = this._elementOrElementsWithPredicateWeighted(
+                predicate, weighting, true);
+  return au._returnFirstElem($(elems));
+};
+
+UIAElement.prototype.getAllWithPredicate = function (predicate) {
+  var weighting = ['elements'];
+  var elems = this._elementOrElementsWithPredicateWeighted(predicate, weighting);
+  return au._returnElems($(elems));
+};
+
+UIAElement.prototype._elementOrElementsWithPredicateWeighted = function (predicate, weighting, onlyFirst) {
+  var onlyFirst = (onlyFirst === true);
+  var weighting = weighting || ['elements'];
+
+  UIATarget.localTarget().pushTimeout(0);
+
+  var results = [];
+  var element = this;
+  var func, found;
+  $.each(weighting, function (idx, prop) {
+    if (typeof element[prop] === 'function') {
+      found = element[prop]().withPredicate(predicate)
+                  .withValueForKey(true, 'isVisible');
+    } else {
+      throw new Error("Invalid function '" + prop + "'");
+    }
+
+    if (found.isValid()) {
+      results = results.concat(found.toArray());
+    }
+
+    // If we don't find anything or if we aren't just trying to find the first
+    // match, keep looking. Otherwise exit the loop.
+    return (!onlyFirst || results.length === 0);
+  });
+
+  // Only look through children if we have to.
+  if (!onlyFirst || results.length === 0) {
+    var child;
+    for (var a = 0, len = this.elements().length; a < len; a++) {
+        child = this.elements()[a];
+        results = results.concat(child
+                    ._elementOrElementsWithPredicateWeighted(predicate,
+                      weighting, onlyFirst));
+    }
+  }
+
+  UIATarget.localTarget().popTimeout();
+
+  return results;
+};
+
+UIAElement.prototype.getNameContains = function (targetName) {
+  return this.getFirstWithPredicate("name contains[c] '" + targetName + "' || label contains[c] '" + targetName + "'");
+};
+
 UIAElement.prototype.getPageSource = function () {
   return JSON.stringify(this.getTree());
 };
