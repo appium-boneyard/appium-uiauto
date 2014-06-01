@@ -217,8 +217,7 @@ $.extend(au, {
       // (e.g. 0 or 1 for a switch). If this happens, UIAutomation will
       // throw an exception since predicate keywords like CONTAINS and LIKE can
       // only be performed on a collection/string.
-      return "name contains[c] '" + sel + "' || label contains[c] '" + sel
-        + "'";
+      return "name contains[c] '" + sel + "' || label contains[c] '" + sel + "'";
     }
   }
 

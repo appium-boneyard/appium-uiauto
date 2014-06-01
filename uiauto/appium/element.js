@@ -238,14 +238,14 @@ UIAElement.prototype.getAllWithPredicate = function (predicate) {
 };
 
 UIAElement.prototype._elementOrElementsWithPredicateWeighted = function (predicate, weighting, onlyFirst) {
-  var onlyFirst = (onlyFirst === true);
-  var weighting = weighting || ['elements'];
+  onlyFirst = (onlyFirst === true);
+  weighting = weighting || ['elements'];
 
   UIATarget.localTarget().pushTimeout(0);
 
   var results = [];
   var element = this;
-  var func, found;
+  var found;
   $.each(weighting, function (idx, prop) {
     if (typeof element[prop] === 'function') {
       found = element[prop]().withPredicate(predicate)

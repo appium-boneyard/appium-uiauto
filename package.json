@@ -1,8 +1,8 @@
 {
   "name": "appium-uiauto",
-  "version": "0.0.20",
+  "version": "1.0.0-beta1",
   "description": "appium uiauto ios driver",
-  "main": "index.js",
+  "main": "lib/main.js",
   "bin": {
     "instruments-client.js": "./bin/instruments-client.js"
   },
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/appium/appium-uiauto.git"
+    "url": "https://github.com/appium/appium-uiauto/tree/1.0.0-beta"
   },
   "author": "",
   "licenses": [
@@ -25,6 +25,15 @@
   },
   "homepage": "https://github.com/appium/appium-uiauto",
   "dependencies": {
-    "argparse": "~0.1.15"
+    "argparse": "~0.1.15",
+    "mkdirp": "~0.5.0",
+    "q": "~1.0.1",
+    "winston": "~0.7.3"
+  },
+  "devDependencies": {
+    "jscs": "~1.4.5",
+    "jshint": "~2.5.1",
+    "rimraf": "~2.2.8",
+    "sinon": "^1.10.2"
   }
 }

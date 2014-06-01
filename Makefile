@@ -1,11 +1,15 @@
-current_dir = $(shell pwd)
-xcode_path:="$(shell xcode-select -print-path | sed s/\\/Contents\\/Developer//g)"
+JSHINT_BIN=./node_modules/.bin/jshint
+JSCS_BIN=./node_modules/.bin/jscs
 
-DEFAULT: jshint
+default: jshint jscs
 
 jshint:
-	jshint uiauto
+	@$(JSHINT_BIN) lib uiauto test
+
+jscs:
+	@$(JSCS_BIN) lib test
 
 .PHONY: \
 	DEFAULT \
-	jshint \
+	jscs \
+	jshint

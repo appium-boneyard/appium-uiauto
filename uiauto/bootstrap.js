@@ -1,4 +1,5 @@
-/* globals target, curAppiumCmdId, getFirstCommand, sendResultAndGetNext, codes */
+/* globals setenv, target, curAppiumCmdId, getFirstCommand, sendResultAndGetNext, codes */
+/* exported bootstrap */
 
 /* jshint ignore:start */
 #import "lib/helpers.js"
@@ -7,7 +8,8 @@
 #import "appium/base.js"
 /* jshint ignore:end */
 
-(function () {
+var bootstrap = function(dynamicEnv) {
+  setenv(dynamicEnv);
   // safe default
   target.setTimeout(1);
 
@@ -79,5 +81,5 @@
       throw new Error("Error getting next command, shutting down :-(");
     }
   }
-})();
+};
 
