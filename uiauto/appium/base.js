@@ -21,9 +21,10 @@
 
 /* jshint ignore:start */
 #import "../lib/mechanic.js"
+#import "./mechanic_ext.js"
+#import "element.js"
 #import "../lib/status.js"
 #import "utility.js"
-#import "element.js"
 #import "xpath.js"
 #import "app.js"
 #import "binding.js"

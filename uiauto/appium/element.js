@@ -6,52 +6,6 @@ UIAElementNil.prototype.type = function () {
 
 UIAElementNil.prototype.isNil = function () { return true; };
 
-// this is mechanic notation for extending $(UIAElement)
-$.extend($.fn, {
-  getActiveElement: function () {
-      var foundElement = null;
-      var checkAll = function (element) {
-        var children = $(element).children();
-        children.each(function (e, child) {
-          var focused = $(child).isFocused();
-          if (focused === true || focused === 1) {
-            return child;
-          }
-          if (child.hasChildren()) { // big optimization
-            checkAll(child);
-          }
-        });
-
-        return null;
-      };
-      // try au.cache in the array first
-      for (var key in au.cache) {
-        var elemFocused = $(au.cache[key]).isFocused();
-        if (elemFocused === true || elemFocused === 1) {
-          return {
-            status: codes.Success.code,
-            value: {ELEMENT: key}
-          };
-        }
-      }
-      foundElement = checkAll(this);
-
-      if (foundElement) {
-        var varName = $(foundElement).name();
-        return {
-          status: codes.Success.code,
-          value: {ELEMENT: varName}
-        };
-      }
-
-      return {
-        status: codes.NoSuchElement.code,
-        value: null,
-      };
-    }
-
-});
-
 UIAElement.prototype.isNil = function () { return false; };
 
 UIAElement.prototype.setValueByType = function (newValue) {
@@ -224,22 +178,23 @@ UIAElement.prototype.getFirstWithPredicateWeighted = function (predicate) {
   return au._returnFirstElem($(elems));
 };
 
-UIAElement.prototype.getFirstWithPredicate = function (predicate) {
+UIAElement.prototype.getFirstWithPredicate = function (predicate, onlyVisible) {
   var weighting = ['elements'];
   var elems = this._elementOrElementsWithPredicateWeighted(
-                predicate, weighting, true);
+                predicate, weighting, true, onlyVisible);
   return au._returnFirstElem($(elems));
 };
 
-UIAElement.prototype.getAllWithPredicate = function (predicate) {
+UIAElement.prototype.getAllWithPredicate = function (predicate, onlyVisible) {
   var weighting = ['elements'];
-  var elems = this._elementOrElementsWithPredicateWeighted(predicate, weighting);
+  var elems = this._elementOrElementsWithPredicateWeighted(predicate, weighting, false, onlyVisible);
   return au._returnElems($(elems));
 };
 
-UIAElement.prototype._elementOrElementsWithPredicateWeighted = function (predicate, weighting, onlyFirst) {
-  onlyFirst = (onlyFirst === true);
+UIAElement.prototype._elementOrElementsWithPredicateWeighted = function (predicate, weighting, onlyFirst, onlyVisible) {
   weighting = weighting || ['elements'];
+  onlyFirst = (onlyFirst === true);
+  onlyVisible = onlyVisible !== false; 
 
   UIATarget.localTarget().pushTimeout(0);
 
@@ -248,8 +203,9 @@ UIAElement.prototype._elementOrElementsWithPredicateWeighted = function (predica
   var found;
   $.each(weighting, function (idx, prop) {
     if (typeof element[prop] === 'function') {
-      found = element[prop]().withPredicate(predicate)
-                  .withValueForKey(true, 'isVisible');
+      found = element[prop]();
+      if(predicate) found = found.withPredicate(predicate);
+      if(onlyVisible) found = found.withValueForKey(true, 'isVisible');
     } else {
       throw new Error("Invalid function '" + prop + "'");
     }
@@ -270,7 +226,7 @@ UIAElement.prototype._elementOrElementsWithPredicateWeighted = function (predica
         child = this.elements()[a];
         results = results.concat(child
                     ._elementOrElementsWithPredicateWeighted(predicate,
-                      weighting, onlyFirst));
+                      weighting, onlyFirst, onlyVisible));
     }
   }
 
@@ -279,8 +235,20 @@ UIAElement.prototype._elementOrElementsWithPredicateWeighted = function (predica
   return results;
 };
 
-UIAElement.prototype.getNameContains = function (targetName) {
-  return this.getFirstWithPredicate("name contains[c] '" + targetName + "' || label contains[c] '" + targetName + "'");
+UIAElement.prototype.getWithName = function (targetName, onlyVisible) {
+  return this.getFirstWithPredicate("name == '" + targetName + "' || label == '" + targetName + "'", onlyVisible);
+};
+
+UIAElement.prototype.getAllWithName = function (targetName, onlyVisible) {
+  return this.getAllWithPredicate("name == '" + targetName + "' || label == '" + targetName + "'", onlyVisible);
+};
+
+UIAElement.prototype.getNameContains = function (targetName, onlyVisible) {
+  return this.getFirstWithPredicate("name contains[c] '" + targetName + "' || label contains[c] '" + targetName + "'", onlyVisible);
+};
+
+UIAElement.prototype.getAllNameContains = function (targetName, onlyVisible) {
+  return this.getAllWithPredicate("name contains[c] '" + targetName + "' || label contains[c] '" + targetName + "'", onlyVisible);
 };
 
 UIAElement.prototype.getPageSource = function () {
