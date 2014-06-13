@@ -200,14 +200,29 @@ $.extend(au, {
   }
 
 , getElementByName: function (name, ctx) {
-    var selector = ['#', name].join('');
-    var elems = this.lookup(selector, ctx);
+    if (name.match(/\*.*\*/)) {
+      return this._defaultContext(ctx).getNameContains(
+        name.replace(/^\*|\*$/g, ''), false);
+    } else {
+      return this._defaultContext(ctx).getWithName(name, false);
+    }
+  }
 
-    return this._returnFirstElem($(elems));
+, getElementsByName: function (name, ctx) {
+    if (name.match(/^\*.*\*$/)) {
+      return this._defaultContext(ctx).getAllNameContains(
+        name.replace(/^\*|\*$/g, ''), false); 
+    } else {
+      return this._defaultContext(ctx).getAllWithName(name, false);
+    }
   }
 
 , getElementByAccessibilityId: function (accessibilityId, ctx) {
-    return this.getElementByName(accessibilityId, ctx);
+    return this._defaultContext(ctx).getWithName(accessibilityId, false);
+  }
+
+, getElementsByAccessibilityId: function (accessibilityId, ctx) {
+    return this._defaultContext(ctx).getAllWithName(accessibilityId, false);
   }
 
 , _getIdSearchPredicate: function (sel, exact) {
@@ -240,6 +255,17 @@ $.extend(au, {
     var pred = this._getIdSearchPredicate(sel, false);
     return this.mainApp().getAllWithPredicate(pred);
   }
+
+, _defaultContext: function(ctx) 
+{
+  if (typeof ctx === 'string') {
+    return this.cache[ctx];
+  } else if (typeof ctx !== 'undefined') {
+    return ctx;
+  } else {
+    return this.mainApp();
+  }
+}
 
 , _returnFirstElem: function (elems) {
     if (elems.length > 0) {
@@ -297,17 +323,6 @@ $.extend(au, {
     } else {
       return noElemMock;
     }
-  }
-
-, getElementsByName: function (name, ctx) {
-    var selector = ['#', name].join('');
-    var elems = this.lookup(selector, ctx);
-
-    return this._returnElems(elems);
-  }
-
-, getElementsByAccessibilityId: function (accessibilityId, ctx) {
-  return this.getElementsByName(accessibilityId, ctx);
   }
 
 , convertSelector: function (selector) {
