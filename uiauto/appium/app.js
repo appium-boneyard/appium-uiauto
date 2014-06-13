@@ -206,6 +206,10 @@ $.extend(au, {
     return this._returnFirstElem($(elems));
   }
 
+, getElementByAccessibilityId: function (accessibilityId, ctx) {
+    return this.getElementByName(accessibilityId, ctx);
+  }
+
 , _getIdSearchPredicate: function (sel, exact) {
     if (exact) {
       return "name == '" + sel + "' || label == '" + sel + "' || value == '" +
@@ -300,6 +304,10 @@ $.extend(au, {
     var elems = this.lookup(selector, ctx);
 
     return this._returnElems(elems);
+  }
+
+, getElementsByAccessibilityId: function (accessibilityId, ctx) {
+  return this.getElementsByName(accessibilityId, ctx);
   }
 
 , convertSelector: function (selector) {
