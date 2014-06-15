@@ -1,19 +1,28 @@
-/* exported WAIT_FOR_DATA_TIMEOUT, system, target, mainWindow, mainWindow, wd_frame */
-/* exported setenv, user, isVerbose, nodePath, instrumentsClientPath, WAIT_FOR_DATA_TIMEOUT */
+/* globals $ */
 
-// automation globals
-var system = UIATarget.localTarget().host();
-var target = UIATarget.localTarget();
-var mainWindow = target.frontMostApp().mainWindow();
-var wd_frame = target.frontMostApp();
+var env;
 
-// local environment
-var user, isVerbose, nodePath, instrumentsClientPath,
-    WAIT_FOR_DATA_TIMEOUT = 3600;
+// TODO: we should not need those
+var target, au;
 
-var setenv = function(dynamicEnv) {
-  user = dynamicEnv.USER;
-  isVerbose = dynamicEnv.VERBOSE_INSTRUMENTS;
-  nodePath = dynamicEnv.NODE_BIN;
-  instrumentsClientPath = dynamicEnv.INSTRUMENTS_CLIENT_PATH;
-};
+(function() {
+
+  env = {};
+  env.init = function(dynamicEnv) {
+    // safe default
+    $.target().setTimeout(1);
+    target = $.target();
+    au = $;    
+
+    // TODO: move to dynamic env
+    this.autoAcceptAlerts = false;
+
+    this.user = dynamicEnv.USER;
+    this.isVerbose = dynamicEnv.VERBOSE_INSTRUMENTS;
+    this.nodePath = dynamicEnv.NODE_BIN;
+    this.instrumentsClientPath = dynamicEnv.INSTRUMENTS_CLIENT_PATH;
+  };
+
+})();
+
+

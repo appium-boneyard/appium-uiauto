@@ -516,7 +516,7 @@ var $ = $ || mechanic;  // expose $ shortcut
             }
         },
         input: function(s) {
-            target.frontMostApp().keyboard().typeString(s);
+            $.keyboard().typeString(s);
         }
     });
 
