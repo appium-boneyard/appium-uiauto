@@ -44,7 +44,7 @@ var commands;
     return sendResultAndGetNext();
   };
 
-  commands.startProcessing = function() {
+  commands.startProcessing = function () {
     // let server know we're alive and get first command
     var cmd = getFirstCommand();
 

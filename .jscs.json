@@ -1,5 +1,7 @@
 {
-  "excludeFiles": ["node_modules/**", "uiauto/**", "test/AppiumUiAutoTestApp/**"],
+  "excludeFiles": ["node_modules/**", "uiauto/vendors/**", 
+  "test/AppiumUiAutoTestApp/integration/github/**",
+  "test/AppiumUiAutoTestApp/integration/tmp/**"],
   "requireCurlyBraces": ["for", "while", "do", "try", "catch"],
   "requireSpaceAfterKeywords": ["if", "else", "for", "while", "do", "switch", 
     "return", "try", "catch", "function"],

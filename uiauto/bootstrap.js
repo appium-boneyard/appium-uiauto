@@ -11,8 +11,8 @@
 /* jshint ignore:end */
 var bootstrap;
 
-(function() {
-  bootstrap = function(dynamicEnv) {
+(function () {
+  bootstrap = function (dynamicEnv) {
     env.init(dynamicEnv);
     alerts.configure();
     commands.startProcessing();

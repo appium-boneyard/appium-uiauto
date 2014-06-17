@@ -5,14 +5,14 @@ var env;
 // TODO: we should not need those
 var target, au;
 
-(function() {
+(function () {
 
   env = {};
-  env.init = function(dynamicEnv) {
+  env.init = function (dynamicEnv) {
     // safe default
     $.target().setTimeout(1);
     target = $.target();
-    au = $;    
+    au = $;
 
     // TODO: move to dynamic env
     this.autoAcceptAlerts = false;

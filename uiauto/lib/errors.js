@@ -2,7 +2,7 @@
 
 var errors;
 
-(function() {
+(function () {
   errors = {
     Success: {
       code: 0,

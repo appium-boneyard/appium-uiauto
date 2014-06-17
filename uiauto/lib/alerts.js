@@ -2,9 +2,9 @@
 
 var alerts;
 
-(function() {
+(function () {
   alerts = {};
-  alerts.configure = function() {
+  alerts.configure = function () {
     UIATarget.onAlert = function (alert) {
       if (alert.name() && alert.name().indexOf("attempting to open a pop-up") !== -1 && alert.buttons().length > 0) {
         alert.defaultButton().tap();
@@ -12,6 +12,6 @@ var alerts;
         alert.defaultButton().tap();
       }
       return true;
-    };        
+    };
   };
 })();
