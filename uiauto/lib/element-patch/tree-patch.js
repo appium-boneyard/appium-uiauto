@@ -39,7 +39,7 @@
     };
     var tree = getTree(this, 0, "");
     target.popTimeout();
-    return JSON.stringify(tree);
+    return tree;
   };
 
   UIAElement.prototype.getTree = function () {
@@ -70,6 +70,10 @@
     var tree = getTree(this);
     target.popTimeout();
     return tree;
+  };
+
+  UIAElement.prototype.getPageSource = function () {
+    return JSON.stringify(this.getTree());
   };
 
 })();

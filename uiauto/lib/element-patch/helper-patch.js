@@ -89,10 +89,6 @@
     return value === text;
   };
 
-  UIAElement.prototype.getPageSource = function () {
-    return JSON.stringify(this.getTree());
-  };
-
   UIAElement.prototype.getElementLocation = function () {
     return {
       status: errors.Success.code,

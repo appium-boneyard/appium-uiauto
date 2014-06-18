@@ -12,12 +12,17 @@ jscs:
 test_unit:
 	./node_modules/.bin/mocha test/unit
 
-test_integration:
-	cd test/AppiumUiAutoTestApp && bundle && bwoken test
+test_functional:
+	./node_modules/.bin/mocha test/functional
+	make clean_trace
+
+clean_trace:
+	rm -rf instrumentscli*.trace
 
 .PHONY: \
 	DEFAULT \
 	jscs \
 	jshint \
 	test_unit \
-	test_integration
+	test_integration \
+	clean_trace

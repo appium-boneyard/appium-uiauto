@@ -30,8 +30,8 @@ describe('dynamic bootstrap', function () {
     env.USER.should.equal(process.env.USER);
     env.NODE_BIN.should.equal(process.execPath);
     env.CWD.should.equal(process.cwd());
-    env.INSTRUMENTS_CLIENT_PATH.should.exist;
-    fs.existsSync(env.INSTRUMENTS_CLIENT_PATH).should.be.ok;
+    env.COMMAND_PROXY_CLIENT_PATH.should.exist;
+    fs.existsSync(env.COMMAND_PROXY_CLIENT_PATH).should.be.ok;
     env.VERBOSE_INSTRUMENTS.should.equal(opts.VERBOSE_INSTRUMENTS);
   }
 
@@ -48,12 +48,12 @@ describe('dynamic bootstrap', function () {
   });
 
   it('should generate dynamic bootstrap', function (done) {
-    process.env.DYNAMIC_BOOTSTRAP_DIR = '/tmp/appium-uiauto/test/bootstrap';
-    rimraf(process.env.DYNAMIC_BOOTSTRAP_DIR)
+    process.env.APPIUM_BOOTSTRAP_DIR = '/tmp/appium-uiauto/test/unit/bootstrap';
+    rimraf(process.env.APPIUM_BOOTSTRAP_DIR)
       // first call: should create new bootstrap file
       .then(function () { return prepareBootstrap(); })
       .then(function (bootstrapFile) {
-        bootstrapFile.should.match(/\/tmp\/appium-uiauto\/test\/bootstrap\/bootstrap\-.*\.js/);
+        bootstrapFile.should.match(/\/tmp\/appium-uiauto\/test\/unit\/bootstrap\/bootstrap\-.*\.js/);
         var code = fs.readFileSync(bootstrapFile, 'utf8');
         checkCode(code, {VERBOSE_INSTRUMENTS: false});
       }).then(function () {
@@ -62,7 +62,7 @@ describe('dynamic bootstrap', function () {
       // second call: should reuse bootstrap file
       .then(function () { return prepareBootstrap(); })
       .then(function (bootstrapFile) {
-        bootstrapFile.should.match(/\/tmp\/appium-uiauto\/test\/bootstrap\/bootstrap\-.*\.js/);
+        bootstrapFile.should.match(/\/tmp\/appium-uiauto\/test\/unit\/bootstrap\/bootstrap\-.*\.js/);
         var code = fs.readFileSync(bootstrapFile, 'utf8');
         checkCode(code, {VERBOSE_INSTRUMENTS: false});
       }).then(function () {
@@ -71,7 +71,7 @@ describe('dynamic bootstrap', function () {
       // second call call with different param: should create different bootstrap file
       .then(function () { return prepareBootstrap({verboseInstruments: true});})
       .then(function (bootstrapFile) {
-        bootstrapFile.should.match(/\/tmp\/appium-uiauto\/test\/bootstrap\/bootstrap\-.*\.js/);
+        bootstrapFile.should.match(/\/tmp\/appium-uiauto\/test\/unit\/bootstrap\/bootstrap\-.*\.js/);
         var code = fs.readFileSync(bootstrapFile, 'utf8');
         checkCode(code, {VERBOSE_INSTRUMENTS: true});
       })

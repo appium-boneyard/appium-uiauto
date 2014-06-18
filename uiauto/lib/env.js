@@ -20,7 +20,7 @@ var target, au;
     this.user = dynamicEnv.USER;
     this.isVerbose = dynamicEnv.VERBOSE_INSTRUMENTS;
     this.nodePath = dynamicEnv.NODE_BIN;
-    this.instrumentsClientPath = dynamicEnv.INSTRUMENTS_CLIENT_PATH;
+    this.commandProxyClientPath = dynamicEnv.COMMAND_PROXY_CLIENT_PATH;
   };
 
 })();

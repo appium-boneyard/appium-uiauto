@@ -87,7 +87,6 @@
 
   , scrollFirstView: function (direction) {
       var viewRes = this.getElementByType('scrollview');
-      $.log(JSON.stringify(viewRes));
       var doScroll = function (elId) {
         var el = this.getElement(elId);
         var method = 'scroll' + direction[0].toUpperCase() + direction.slice(1);

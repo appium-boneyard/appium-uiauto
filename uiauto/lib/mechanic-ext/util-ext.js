@@ -1,20 +1,9 @@
 /* globals $, errors */
 
 (function() {
-  var delaySec = $.delay;
-
   $.extend($, {
     cache: []
   , identifier: 0
-  , system: function() { return UIATarget.localTarget().host(); }
-  , target: function () { return UIATarget.localTarget(); }
-  , mainWindow: function () { return UIATarget.localTarget().frontMostApp().mainWindow(); }
-  , mainApp: function () { return UIATarget.localTarget().frontMostApp(); }
-  , keyboard: function () { return UIATarget.localTarget().frontMostApp().keyboard(); }
-  , bundleId: function()  { return UIATarget.localTarget().frontMostApp().bundleID(); }
-  // overriding existing delay
-  , delay: function (ms) { delaySec.call(this, ms/1000); }
-
   , _defaultContext: function(ctx) {
     if (typeof ctx === 'string') {
       return this.cache[ctx];
