@@ -4,16 +4,16 @@ JSCS_BIN=./node_modules/.bin/jscs
 default: jshint jscs test_unit
 
 jshint:
-	@$(JSHINT_BIN) lib uiauto test
+	@$(JSHINT_BIN) lib uiauto test bin
 
 jscs:
-	@$(JSCS_BIN) lib/** uiauto/** test/** 
+	@$(JSCS_BIN) lib/** uiauto/** test/** bin/** 
 
 test_unit:
 	./node_modules/.bin/mocha test/unit
 
-test_functional:
-	./node_modules/.bin/mocha test/functional
+test_uiauto:
+	./node_modules/.bin/mocha test/uiauto
 	make clean_trace
 
 clean_trace:

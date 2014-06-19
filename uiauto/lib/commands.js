@@ -1,10 +1,13 @@
-// The messages route is the following:
+// The message route is the following:
 // Appium <--> Command Proxy <--> Instruments
-// The medium between Instruments and Command Proxy is the command-proxy-client script.
-// The format of the Command Proxy --> Instruments messages is {cmd:"<CMD>"}
-// The format of the Instruments --> Command Proxy messages is:
+// The medium between Instruments and Command Proxy is the command-proxy-client
+// script.
+//
+// Command Proxy --> Instruments message format: {cmd:"<CMD>"}
+//
+// Instruments --> Command Proxy message format:
 // <one char message type>,<stringified json data>
-// The json data in the message above has the following format:
+// <stringified json data> format:
 // {status:<status>, value:<result>}
 
 /* globals $, errors, env */
@@ -58,7 +61,7 @@ var commands;
         var stringResult = JSON.stringify(result);
         if (stringResult.length < BIG_DATA_THRESHOLD){
           // regular small results
-          args.push(MESSAGE_TYPES.indexOf('regular') + ',' +stringResult);
+          args.push(MESSAGE_TYPES.indexOf('regular') + ',' + stringResult);
         } else {
           // initiating big result transfer
           bigResult = new BigResult(stringResult);

@@ -1,4 +1,6 @@
+/* globals $ */
 'use strict';
+
 
 var chai = require('chai'),
     chaiAsPromised = require("chai-as-promised"),
@@ -22,7 +24,7 @@ describe('commands', function () {
   var prepareBootstrap = function () {
     var env = getEnv();
     var code = fs.readFileSync(path.resolve(
-      __dirname, '../../test/assets/commands-bootstrap.js'), 'utf8');
+      __dirname, '../../test/assets/base-bootstrap.js'), 'utf8');
 
     _({
       '<ROOT_DIR>': path.resolve(__dirname, '../..'),
@@ -224,6 +226,7 @@ describe('commands', function () {
 
 
   describe("command with big result", function () {
+
     var ctx, sendCommand;
 
     var testN = function (n) {
@@ -254,11 +257,50 @@ describe('commands', function () {
       return sendCommand('$.oneMamaHugeTree(' + n + ', ' + d + ')');
     };
 
+    // UIAuto code
+    var configureUIAuto = function () {
+      $.extend($, {
+        oneMamaLongString: function (n, mapping) {
+          var i;
+          if (!mapping) {
+            mapping = [];
+            for (i=0; i<n; i++){
+              mapping.push(i);
+            }
+          }
+          var main = "";
+          for (i = 0; i < n; i++) {
+            main += mapping[i % 10];
+          }
+          return main;
+        },
+
+        oneMamaHugeTree: function (n, d) {
+          //var root = {name: 'root'};
+          function addChildren(root, depth) {
+            if (depth === d) return;
+            root.children = {};
+            var i;
+            for (i=0; i<n; i++){
+              root.children['c' + i] = { name: 'child ' + i };
+              addChildren(root.children['c' + i], depth +1);
+            }
+          }
+          var root = {name: 'root'};
+          addChildren(root, 0);
+          return root;
+        },
+
+      });
+    };
+
     before(function () {
       return init()
         .then(function (_ctx) {
           ctx = _ctx;
           sendCommand = sendCommandBase.bind(null, ctx);
+        }).then(function () {
+          return sendCommand('(' +configureUIAuto.toString() + ')()');
         });
     });
 
