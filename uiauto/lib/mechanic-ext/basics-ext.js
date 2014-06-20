@@ -11,5 +11,6 @@
     , bundleId: function()  { return UIATarget.localTarget().frontMostApp().bundleID(); }
     // overriding existing delay
     , delay: function (ms) { delaySec.call(this, ms/1000); }
+    , logTree: function() {$($.mainApp()).logTree();}
   });
 })();

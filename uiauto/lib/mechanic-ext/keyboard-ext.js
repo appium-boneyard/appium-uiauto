@@ -52,29 +52,35 @@
       }
     }
 
-  , hideKeyboard: function (keyName) {
-      if (keyName) {
-        $.log("Hiding keyboard with keyName " + keyName);
-        try {
-          var keys = $.keyboard().buttons();
-          keys[keyName].tap();
-        } catch (e) {
-          return {
-            status: errors.NoSuchElement.code
-          , value: "Could not find the '" + keyName + "' button, " +
-                   "you're on your own for closing it!"
-          };
-        }
-      } else if (!$.keyboard().isNil()) {
-        $.log("Hiding keyboard using default method");
-        var startY = $.keyboard().rect().origin.y - 10;
-        var endY = $.mainWindow().rect().size.height - 10;
-        this.flickApp(0, startY, 0, endY);
-      } else {
-        return {
-          status: errors.NoSuchElement.code
-        , value: "The keyboard was not present, not closing it"
-        };
+  , hideKeyboard: function (strategy, keyName) {
+      var tapOutside = function() {
+        $($.mainWindow()).tap();
+        $.delay(1000);
+      };
+      switch(strategy) {
+        case 'press':
+        case 'pressKey':
+          $.log("Hiding keyboard by pressing the key: " + keyName);
+          try {
+            var keys = $.keyboard().buttons();
+            keys[keyName].tap();
+          } catch (e) {
+            return {
+              status: errors.NoSuchElement.code,
+              value: "Could not find the '" + keyName + "' key."
+            };
+          }
+          $.delay(1000);
+          break;
+        case 'tapOut':
+        case 'tapOutside':
+          tapOutside();
+          break;
+        case 'default':
+          tapOutside();
+          break;
+        default: 
+          throw new Error('Unknown strategy: ' + strategy);
       }
     }
   });
