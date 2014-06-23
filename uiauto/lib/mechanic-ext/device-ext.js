@@ -1,6 +1,6 @@
 /* globals $, errors */
 
-(function() {
+(function () {
   $.extend($, {
     back: function () {
       var bar = $.mainWindow().navigationBar();

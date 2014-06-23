@@ -1,10 +1,10 @@
 /* globals $, errors */
 
-(function() {
+(function () {
   $.extend($, {
     cache: []
   , identifier: 0
-  , _defaultContext: function(ctx) {
+  , _defaultContext: function (ctx) {
     if (typeof ctx === 'string') {
       return this.cache[ctx];
     } else if (typeof ctx !== 'undefined') {

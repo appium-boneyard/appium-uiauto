@@ -1,4 +1,4 @@
-(function() {
+(function () {
   UIAElementNil.prototype.type = function () {
     return "UIAElementNil";
   };

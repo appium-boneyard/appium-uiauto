@@ -1,6 +1,6 @@
 /* globals $ */
 
-(function() {
+(function () {
 
   UIAElement.prototype.getTreeForXML = function () {
     var target = $.target();

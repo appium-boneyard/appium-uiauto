@@ -1,6 +1,6 @@
 /* globals errors, $ */
 
-(function() {
+(function () {
   $.extend($, {
 
     // Element lookup functions
@@ -65,7 +65,7 @@
   , getElementsByName: function (name, ctx) {
       if (name.match(/^\*.*\*$/)) {
         return this._defaultContext(ctx).getAllNameContains(
-          name.replace(/^\*|\*$/g, ''), false); 
+          name.replace(/^\*|\*$/g, ''), false);
       } else {
         return this._defaultContext(ctx).getAllWithName(name, false);
       }
@@ -190,7 +190,7 @@
         return [];
       } else if (elems instanceof UIAElementArray) {
         //tricky: UIAutomation returns UIElementArray objects, not standard js array. Mechanic.js expects objects of type Array
-        return  elems.toArray();
+        return elems.toArray();
       } else {
         return [elems];
       }

@@ -1,6 +1,6 @@
 /* globals $, errors */
 
-(function() {
+(function () {
   $.extend($, {
     _getNodeIndex: function (seg) {
       var index = /\[(\d+|last\(\))\]/;

@@ -1,6 +1,6 @@
 /* globals $, errors */
 
-(function() {
+(function () {
   UIAElement.prototype.setValueByType = function (newValue) {
     var type = this.type();
 

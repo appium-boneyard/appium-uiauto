@@ -1,6 +1,6 @@
 /* globals $, errors */
 
-(function() {
+(function () {
   $.extend($, {
     // Keyboard functions
     sendKeysToActiveElement: function (keys) {
@@ -17,16 +17,18 @@
 
   , hasSpecialKeys: function (keys) {
       var numChars = keys.length;
-      for (var i = 0; i < numChars; i++)
+      for (var i = 0; i < numChars; i++){
         if (this.isSpecialKey(keys.charAt(i)))
           return true;
+      }
       return false;
     }
 
   , sendKeysToActiveElementSpecial: function (keys) {
       var numChars = keys.length;
-      for (var i = 0; i < numChars; i++)
+      for (var i = 0; i < numChars; i++){
         this.typeKey(keys.charAt(i));
+      }
       return {
         status: errors.Success.code,
         value: null
@@ -53,11 +55,11 @@
     }
 
   , hideKeyboard: function (strategy, keyName) {
-      var tapOutside = function() {
+      var tapOutside = function () {
         $($.mainWindow()).tap();
         $.delay(1000);
       };
-      switch(strategy) {
+      switch (strategy) {
         case 'press':
         case 'pressKey':
           $.log("Hiding keyboard by pressing the key: " + keyName);
@@ -79,7 +81,7 @@
         case 'default':
           tapOutside();
           break;
-        default: 
+        default:
           throw new Error('Unknown strategy: ' + strategy);
       }
     }

@@ -1,6 +1,6 @@
 /* globals errors */
 
-(function() {
+(function () {
 
   // does a flick from a center of a specified element (use case: sliders)
   UIAElement.prototype.touchFlick = function (xoffset, yoffset) {

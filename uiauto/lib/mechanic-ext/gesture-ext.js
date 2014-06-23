@@ -1,6 +1,6 @@
 /* globals $, errors */
 
-(function() {
+(function () {
   $.extend($, {
 
     // Gesture functions

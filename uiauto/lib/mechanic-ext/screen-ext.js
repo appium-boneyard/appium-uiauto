@@ -1,6 +1,6 @@
 /* globals $, errors */
 
-(function() {
+(function () {
   $.extend($, {
 
     // Screen-related functions
@@ -96,6 +96,6 @@
       }
       return indicators;
     }
-    
+
   });
 })();

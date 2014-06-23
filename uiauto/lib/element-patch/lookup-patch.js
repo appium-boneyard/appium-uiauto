@@ -1,6 +1,6 @@
 /* globals $ */
 
-(function() {
+(function () {
 
   UIAElement.prototype.getFirstWithPredicateWeighted = function (predicate) {
     var weighting = [
@@ -30,7 +30,7 @@
   UIAElement.prototype._elementOrElementsWithPredicateWeighted = function (predicate, weighting, onlyFirst, onlyVisible) {
     weighting = weighting || ['elements'];
     onlyFirst = (onlyFirst === true);
-    onlyVisible = onlyVisible !== false; 
+    onlyVisible = onlyVisible !== false;
 
     UIATarget.localTarget().pushTimeout(0);
 
@@ -40,8 +40,8 @@
     $.each(weighting, function (idx, prop) {
       if (typeof element[prop] === 'function') {
         found = element[prop]();
-        if(predicate) found = found.withPredicate(predicate);
-        if(onlyVisible) found = found.withValueForKey(true, 'isVisible');
+        if (predicate) found = found.withPredicate(predicate);
+        if (onlyVisible) found = found.withValueForKey(true, 'isVisible');
       } else {
         throw new Error("Invalid function '" + prop + "'");
       }
