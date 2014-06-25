@@ -39,12 +39,12 @@ describe('dynamic bootstrap', function () {
   before(function () {
     origEnv = _.clone(process.env);
     process.env.VERBOSE_INSTRUMENTS = false;
-    sinon.spy(logger, "warn");
+    sinon.spy(logger, "debug");
   });
 
   after(function () {
     process.env.VERBOSE_INSTRUMENTS = origEnv.VERBOSE_INSTRUMENTS;
-    logger.warn.restore();
+    logger.debug.restore();
   });
 
   it('should generate dynamic bootstrap', function (done) {
@@ -57,7 +57,8 @@ describe('dynamic bootstrap', function () {
         var code = fs.readFileSync(bootstrapFile, 'utf8');
         checkCode(code, {VERBOSE_INSTRUMENTS: false});
       }).then(function () {
-        logger.warn.getCall(1).args[0].should.match(/Creating or overwritting dynamic bootstrap/);
+        logger.debug.calledWithMatch(/Creating or overwritting dynamic bootstrap/).should.be.ok;
+        logger.debug.reset();
       })
       // second call: should reuse bootstrap file
       .then(function () { return prepareBootstrap(); })
@@ -66,9 +67,10 @@ describe('dynamic bootstrap', function () {
         var code = fs.readFileSync(bootstrapFile, 'utf8');
         checkCode(code, {VERBOSE_INSTRUMENTS: false});
       }).then(function () {
-        logger.warn.getCall(3).args[0].should.match(/Reusing dynamic bootstrap/);
+        logger.debug.calledWithMatch(/Reusing dynamic bootstrap/).should.be.ok;
+        logger.debug.reset();
       })
-      // second call call with different param: should create different bootstrap file
+      // third call call with different param: should create different bootstrap file
       .then(function () { return prepareBootstrap({verboseInstruments: true});})
       .then(function (bootstrapFile) {
         bootstrapFile.should.match(/\/tmp\/appium-uiauto\/test\/unit\/bootstrap\/bootstrap\-.*\.js/);
@@ -76,8 +78,9 @@ describe('dynamic bootstrap', function () {
         checkCode(code, {VERBOSE_INSTRUMENTS: true});
       })
       .then(function () {
-        logger.warn.getCall(5).args[0].should.match(/Creating or overwritting dynamic bootstrap/);
-      }).nodeify(done);
+        logger.debug.calledWithMatch(/Creating or overwritting dynamic bootstrap/).should.be.ok;
+      })
+      .nodeify(done);
   });
 
 });

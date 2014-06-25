@@ -12,6 +12,6 @@
     // overriding existing delay
     , delay: function (ms) { delaySec.call(this, ms/1000); }
     , logTree: function () {$($.mainApp()).logTree();}
-    , debug: function(s) { if($.isVerbose) UIALogger.logDebug(s); }
+    , debug: function (s) { if ($.isVerbose) UIALogger.logDebug(s); }
   });
 })();
