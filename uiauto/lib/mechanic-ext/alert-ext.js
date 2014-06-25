@@ -133,10 +133,10 @@
           isClosed = true;
         } else if (i > 10) {
           // assume another alert popped up
-          $.log("Waited for a while and alert didn't close, moving on");
+          $.debug("Waited for a while and alert didn't close, moving on");
           isClosed = true;
         } else {
-          $.log("Waiting for alert to close...");
+          $.debug("Waiting for alert to close...");
           this.delay(300);
           alert = $.mainApp().alert();
         }

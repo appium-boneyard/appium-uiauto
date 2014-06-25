@@ -30,7 +30,7 @@
     "winston": "~0.7.3"
   },
   "devDependencies": {
-    "appium-instruments": "1.1.1",
+    "appium-instruments": "~1.2.0",
     "chai": "~1.9.1",
     "chai-as-promised": "~4.1.1",
     "jscs": "~1.5.3",

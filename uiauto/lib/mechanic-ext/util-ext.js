@@ -81,7 +81,7 @@
         var invisible = 0;
 
         for (var i = 0; i < indicators.length; i++) {
-          $.log("[" + counter + "] waiting on " + indicators[i].type() + ": " +
+          $.debug("[" + counter + "] waiting on " + indicators[i].type() + ": " +
               " visible: " + indicators[i].isVisible() +
               " parent: " + indicators[i].parent().type());
 
@@ -103,7 +103,7 @@
       $.target().popTimeout();
       if (!done) {
         // indicators never went away...
-        $.log("WARNING: Waited for indicators to become non-visible but they never did, moving on");
+        $.debug("WARNING: Waited for indicators to become non-visible but they never did, moving on");
         return {
           status: errors.UnknownError.code,
           value: "Timed out waiting on activity indicator."

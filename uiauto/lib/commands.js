@@ -75,20 +75,20 @@ var commands;
     var cmdLog = cmd.slice(0, 300) + '...';
     var res;
     try {
-      $.log("Running system command #" + curAppiumCmdId + ": " + cmdLog);
+      $.debug("Running system command #" + curAppiumCmdId + ": " + cmdLog);
       res = $.system().performTaskWithPathArgumentsTimeout(env.nodePath, args, WAIT_FOR_DATA_TIMEOUT);
     } catch (e) {
-      $.log(e.name + " error getting command " + curAppiumCmdId + ": " + e.message);
+      $.debug(e.name + " error getting command " + curAppiumCmdId + ": " + e.message);
       return null;
     }
     if (!res) {
-      $.log("Command proxy client (" + cmd + ") exited with null res");
+      $.debug("Command proxy client (" + cmd + ") exited with null res");
       return null;
     }
     if (res.exitCode !== 0) {
-      $.log("Command proxy client (" + cmd + ") exited with " + res.exitCode +
+      $.debug("Command proxy client (" + cmd + ") exited with " + res.exitCode +
                   ", here's stdout:");
-      $.log(res.stdout);
+      $.debug(res.stdout);
       return null;
     }
     var output = res.stdout.replace(/^(.*\n)*----- OUTPUT -----\r?\n/g,'');
@@ -106,11 +106,11 @@ var commands;
     while (true) {
       if (cmd) {
         var result;
-        $.log("Got new command " + curAppiumCmdId + " from instruments: " + cmd);
+        $.debug("Got new command " + curAppiumCmdId + " from instruments: " + cmd);
         try {
           if (cmd.indexOf(BOOTSTRAP_CONFIG_PREFIX) === 0) {
             var configStr = cmd.slice(BOOTSTRAP_CONFIG_PREFIX.length);
-            $.log("Got bootstrap config: " + configStr);
+            $.debug("Got bootstrap config: " + configStr);
             eval(configStr);
           } else if (cmd === MORE_COMMAND) {
             result = {
@@ -142,10 +142,10 @@ var commands;
         }
         if (typeof result === "undefined" || result === null) {
           result = '';
-          $.log("Command executed without response");
+          $.debug("Command executed without response");
         }
         if (typeof result.status === "undefined" || typeof result.status === "object") {
-          $.log("Result is not protocol compliant, wrapping");
+          $.debug("Result is not protocol compliant, wrapping");
           result = {
             status: errors.Success.code,
             value: result

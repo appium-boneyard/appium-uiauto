@@ -47,7 +47,7 @@
   , getId: function (el) {
       var id = (this.identifier++).toString();
       if (el.name() !== null) {
-        $.log('Lookup returned ' + el + ' with the name "' + el.name() + '" (id: ' + id + ').');
+        $.debug('Lookup returned ' + el + ' with the name "' + el.name() + '" (id: ' + id + ').');
       }
       this.cache[id] = el;
       return id;

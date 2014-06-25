@@ -62,7 +62,7 @@
       switch (strategy) {
         case 'press':
         case 'pressKey':
-          $.log("Hiding keyboard by pressing the key: " + keyName);
+          $.debug("Hiding keyboard by pressing the key: " + keyName);
           try {
             var keys = $.keyboard().buttons();
             keys[keyName].tap();
