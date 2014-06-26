@@ -149,7 +149,7 @@
           var nodeElems = [];
           for (var j = 0; j < nodes.length; j++) {
             if (path.search === "child") {
-              nodeElems = nodeElems.concat(elems.childrenByType(nodes[j]));
+              nodeElems = nodeElems.concat(elems.children(nodes[j]));
             } else if (path.search === "desc") {
               nodeElems = nodeElems.concat(elems.find(nodes[j]));
             }
