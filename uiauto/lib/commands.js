@@ -121,7 +121,12 @@ var commands;
             /* jshint evil:true */
             try {
               $.debug('evaluating ' + cmd);
-              result = eval(cmd);
+              try {
+                result = eval(cmd);
+              } catch (err) {
+                $.error('Error during eval: ' + err.stack);
+                throw err;
+              }
               $.debug('evaluation finished');
             } catch (possStaleEl) {
               if (possStaleEl.message === errors.StaleElementReference.code) {
