@@ -7,8 +7,7 @@ var chai = require('chai'),
     Q = require('q'),
     rimraf = Q.denodeify(require('rimraf')),
     sinon = require('sinon'),
-    sinonChai = require("sinon-chai"),
-    _ = require('underscore');
+    sinonChai = require("sinon-chai");
 
 chai.should();
 chai.use(sinonChai);
@@ -23,27 +22,20 @@ describe('dynamic bootstrap', function () {
     return eval(code.replace(/#import.*/g, ''));
   }
 
-  function checkCode(code, opts) {
+  function checkCode(code) {
     code.should.match(/#import/);
     /* jshint evil:true */
     var env = envFromCode(code);
-    env.USER.should.equal(process.env.USER);
-    env.NODE_BIN.should.equal(process.execPath);
-    env.CWD.should.equal(process.cwd());
-    env.COMMAND_PROXY_CLIENT_PATH.should.exist;
-    fs.existsSync(env.COMMAND_PROXY_CLIENT_PATH).should.be.ok;
-    env.VERBOSE_INSTRUMENTS.should.equal(opts.VERBOSE_INSTRUMENTS);
+    env.nodePath.should.equal(process.execPath);
+    env.commandProxyClientPath.should.exist;
+    fs.existsSync(env.commandProxyClientPath).should.be.ok;
   }
 
-  var origEnv = {};
   before(function () {
-    origEnv = _.clone(process.env);
-    process.env.VERBOSE_INSTRUMENTS = false;
     sinon.spy(logger, "debug");
   });
 
   after(function () {
-    process.env.VERBOSE_INSTRUMENTS = origEnv.VERBOSE_INSTRUMENTS;
     logger.debug.restore();
   });
 
@@ -55,8 +47,9 @@ describe('dynamic bootstrap', function () {
       .then(function (bootstrapFile) {
         bootstrapFile.should.match(/\/tmp\/appium-uiauto\/test\/unit\/bootstrap\/bootstrap\-.*\.js/);
         var code = fs.readFileSync(bootstrapFile, 'utf8');
-        checkCode(code, {VERBOSE_INSTRUMENTS: false});
-      }).then(function () {
+        checkCode(code);
+      })
+      .then(function () {
         logger.debug.calledWithMatch(/Creating or overwritting dynamic bootstrap/).should.be.ok;
         logger.debug.reset();
       })
@@ -65,20 +58,24 @@ describe('dynamic bootstrap', function () {
       .then(function (bootstrapFile) {
         bootstrapFile.should.match(/\/tmp\/appium-uiauto\/test\/unit\/bootstrap\/bootstrap\-.*\.js/);
         var code = fs.readFileSync(bootstrapFile, 'utf8');
-        checkCode(code, {VERBOSE_INSTRUMENTS: false});
+        checkCode(code);
       }).then(function () {
         logger.debug.calledWithMatch(/Reusing dynamic bootstrap/).should.be.ok;
         logger.debug.reset();
       })
-      // third call call with different param: should create different bootstrap file
-      .then(function () { return prepareBootstrap({verboseInstruments: true});})
-      .then(function (bootstrapFile) {
+      // third call with extra imports: should create different bootstrap file
+      .then(function () {
+        var imports = {pre: ['dir1/alib.js'] };
+        return prepareBootstrap({imports: imports});
+      }).then(function (bootstrapFile) {
         bootstrapFile.should.match(/\/tmp\/appium-uiauto\/test\/unit\/bootstrap\/bootstrap\-.*\.js/);
         var code = fs.readFileSync(bootstrapFile, 'utf8');
-        checkCode(code, {VERBOSE_INSTRUMENTS: true});
+        code.should.match(/#import "dir1\/alib.js";/);
+        checkCode(code, {isVerbose: true, gracePeriod: 5});
       })
       .then(function () {
         logger.debug.calledWithMatch(/Creating or overwritting dynamic bootstrap/).should.be.ok;
+        logger.debug.reset();
       })
       .nodeify(done);
   });

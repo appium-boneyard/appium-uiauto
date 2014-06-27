@@ -15,7 +15,6 @@
 var commands;
 
 (function () {
-  var BOOTSTRAP_CONFIG_PREFIX = "setBootstrapConfig: ";
   var BIG_DATA_THRESHOLD = 50000;
   var MORE_COMMAND = "#more";
   var MESSAGE_TYPES = ['error','no data','regular','chunk','last chunk'];
@@ -108,11 +107,7 @@ var commands;
         var result;
         $.debug("Got new command " + curAppiumCmdId + " from instruments: " + cmd);
         try {
-          if (cmd.indexOf(BOOTSTRAP_CONFIG_PREFIX) === 0) {
-            var configStr = cmd.slice(BOOTSTRAP_CONFIG_PREFIX.length);
-            $.debug("Got bootstrap config: " + configStr);
-            eval(configStr);
-          } else if (cmd === MORE_COMMAND) {
+          if (cmd === MORE_COMMAND) {
             result = {
               status: errors.Success.code,
               type: 'chunk',

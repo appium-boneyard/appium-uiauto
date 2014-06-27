@@ -8,24 +8,13 @@
 #import "<ROOT_DIR>/uiauto/lib/mechanic-ext/basics-ext.js"
 #import "<ROOT_DIR>/uiauto/lib/errors.js"
 #import "<ROOT_DIR>/uiauto/lib/commands.js"
-"<EXTRA_IMPORTS>"
+"<POST_IMPORTS>"
 /* jshint ignore:end */
 
 chai.should();
 
 var env = {};
-env.commandProxyClientPath = "<COMMAND_PROXY_CLIENT_PATH>";
-env.nodePath = "<NODE_BIN>";
-
-// default tuneup.js options
-var testCreateDefaultOptions = function () {
-  return {
-    logStackTrace: false,
-    logTree: true,
-    logTreeJSON: false,
-    screenCapture: true,
-    rethrow: true
-  };
-};
+env.commandProxyClientPath = "<commandProxyClientPath>";
+env.nodePath = "<nodePath>";
 
 commands.startProcessing();

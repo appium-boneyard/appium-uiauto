@@ -1,4 +1,4 @@
-/* globals env, alerts, commands, $ */
+/* globals env, alerts, commands */
 
 /* jshint ignore:start */
 #import "./vendors/mechanic.js"
@@ -14,7 +14,6 @@ var bootstrap;
 (function () {
   bootstrap = function (dynamicEnv) {
     env.init(dynamicEnv);
-    $.isVerbose = env.isVerbose;
     alerts.configure();
     commands.startProcessing();
   };

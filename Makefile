@@ -7,7 +7,7 @@ jshint:
 	@$(JSHINT_BIN) lib uiauto test bin
 
 jscs:
-	@$(JSCS_BIN) lib/** uiauto/** test/** bin/** 
+	@$(JSCS_BIN) lib uiauto test bin 
 
 test_unit:
 	./node_modules/.bin/mocha test/unit

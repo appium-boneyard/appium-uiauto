@@ -5,11 +5,11 @@ var base = require('./base'),
     _ = require('underscore');
 
 describe('keyboard', function () {
-
-  base.globalInit(this, { extraImports: [
+  var imports = { post: [
     'uiauto/lib/mechanic-ext/gesture-ext.js',
     'uiauto/lib/mechanic-ext/keyboard-ext.js',
-  ]});
+  ]};
+  base.globalInit(this, { imports: imports, bootstrap: 'basic'});
 
   describe("hide keyboard", function () {
     /* globals rootPage: true */

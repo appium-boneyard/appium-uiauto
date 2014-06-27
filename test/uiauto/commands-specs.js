@@ -6,7 +6,7 @@ var base = require('./base'),
     Q = require('q');
 
 describe('commands', function () {
-  base.globalInit(this);
+  base.globalInit(this, {bootstrap: 'basic'});
 
   describe("simple sequences", function () {
     var ctx;
