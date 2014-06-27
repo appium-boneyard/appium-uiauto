@@ -50,6 +50,16 @@
     return type.substring(8, type.length - 1);
   };
 
+  UIAElement.prototype.isDuplicate = function () {
+    var type = this.type();
+    if (type.match(/textfield$/i)) {
+      var elements = this.elements();
+      return (elements.length === 1) &&  elements[0].type() === type &&
+        elements[0].name() === this.name();
+    }
+    return false;
+  };
+
   UIAElement.prototype.hasChildren = function () {
     var type = this.type();
     // NOTE: UIALink/UIAImage/UIAElement can have children

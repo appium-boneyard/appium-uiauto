@@ -15,8 +15,14 @@
   }
 
   , _returnFirstElem: function (elems) {
-      if (elems.length > 0) {
-        var el = elems[0];
+      var el;
+      $.each(elems, function(i, _el) {        
+        if(!_el.isDuplicate()) {
+          el = _el;
+          return false;
+        }
+      });
+      if (el) {
         var elid = this.getId(el);
 
         return {
@@ -34,8 +40,10 @@
   , _returnElems: function (elems) {
       var results = [];
       elems.each(function (e, el) {
-        var elid = this.getId(el);
-        results.push({ELEMENT: elid});
+        if(!el.isDuplicate()){
+          var elid = this.getId(el);
+          results.push({ELEMENT: elid});          
+        }
       }.bind(this));
 
       return {
