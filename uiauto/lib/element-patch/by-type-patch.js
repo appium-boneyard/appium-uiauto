@@ -5,7 +5,7 @@
   function _getElementsByType(current, type, foundEls, isParent) {
     if (!isParent && current.isType(type)) {
       var isDuplicate = false;
-      if (type === 'textfield' || type === 'UIATextField') {
+      if (type.match(/textfield$/i)) {
         // fixing duplicated text fields
         $.each(current.elements(), function (idx, child) {
           isDuplicate = isDuplicate || child.isType(type) && child.name() === current.name();

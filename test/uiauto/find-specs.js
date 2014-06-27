@@ -21,7 +21,7 @@ describe('find', function () {
       );
     });
 
-    it('should not return duplicate text fields', function () {
+    it('should not return duplicate UIATextField', function () {
       return ctx.execFunc(
         function () {
           rootPage.clickMenuItem('Text Fields');
@@ -29,6 +29,22 @@ describe('find', function () {
           var cell = $($('#Empty list').children('cell')).first()[0];
           var id = '' + $.getId(cell);
           var res = $.getElementsByType('UIATextField', id);
+          return res;
+        }
+      ).then(function (res) {
+        res.should.have.length(1);
+      });
+    });
+
+    it('should not return duplicate UIASecureTextField', function () {
+      return ctx.execFunc(
+        function () {
+          rootPage.clickMenuItem('Text Fields');
+          $.delay(2000);
+          var cell = $('#Empty list').children('cell')[2];
+          $(cell).logTree();
+          var id = '' + $.getId(cell);
+          var res = $.getElementsByType('UIASecureTextField', id);
           return res;
         }
       ).then(function (res) {
