@@ -146,11 +146,26 @@ exports.instrumentsInstanceInit = function () {
             '})();';
           return ctx.exec(script);
         };
-      })
-      .then(function () {
+      }).then(function () {
         var cmd = '';
         cmd += '$.isVerbose = ' + (process.env.VERBOSE ? true : false) + ';\n';
         return ctx.exec(cmd);
+      })
+      .then(function () {
+        // some uiauto helpers
+        return ctx.execFunc(function () {
+          /* global rootPage:true */
+          rootPage = {};
+          // click item in root page menu
+          rootPage.clickMenuItem = function (partialText) {
+            $.each($('tableview').children(), function (idx, child) {
+              if (child.name().indexOf(partialText) >= 0 ){
+                $(child).tap();
+                return false;
+              }
+            });
+          };
+        });
       }).then(function () {
         return ctx.execFunc(function () {
           /* global $ */

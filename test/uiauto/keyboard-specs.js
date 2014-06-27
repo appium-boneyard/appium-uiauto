@@ -17,22 +17,6 @@ describe('keyboard', function () {
     base.instrumentsInstanceInit()
       .then(function (_ctx) { ctx = _ctx; }).done();
 
-    before(function () {
-      // some uiauto helpers
-      return ctx.execFunc(function () {
-        rootPage = {};
-        // click item in root page menu
-        rootPage.clickMenuItem = function (partialText) {
-          $.each($('tableview').children(), function (idx, child) {
-            if (child.name().indexOf(partialText) >= 0 ){
-              $(child).tap();
-              return false;
-            }
-          });
-        };
-      });
-    });
-
     afterEach(function () {
       return ctx.execFunc(
         function () {
@@ -41,7 +25,6 @@ describe('keyboard', function () {
         }
       );
     });
-
 
     _(['pressKey', 'press']).each(function (strategy) {
       it('should hide the keyboard by pressing the done key (' +
