@@ -279,7 +279,7 @@
         }
       }
       if (ret === null) {
-        $.each(elems,function(i, elem) {
+        $.each(elems,function (i, elem) {
           $(elem).log();
         });
         ret = this._returnElems($(elems));
