@@ -42,13 +42,30 @@ describe('find', function () {
           rootPage.clickMenuItem('Text Fields');
           $.delay(2000);
           var cell = $('#Empty list').children('cell')[2];
-          $(cell).logTree();
           var id = '' + $.getId(cell);
           var res = $.getElementsByType('UIASecureTextField', id);
           return res;
         }
       ).then(function (res) {
         res.should.have.length(1);
+      });
+    });
+
+    it('getTree should not return duplicates', function () {
+      return ctx.execFunc(
+        function () {
+          rootPage.clickMenuItem('Text Fields');
+          $.delay(2000);
+          var cell = $('#Empty list').children('cell')[0];
+          return cell.getTree();
+        }
+      ).then(function (res) {
+        if (process.env.VERBOSE) console.log('--->', res);
+        res.type.should.equal('UIATableCell');
+        res.children.length.should.equal(1);
+        res.children[0].type.should.equal('UIATextField');
+        res.children[0].children.length.should.equal(0);
+        //res.should.have.length(1);
       });
     });
 

@@ -24,6 +24,19 @@ describe('grace period', function () {
       .then(function () { (Date.now() - refMs).should.be.below(1000); });
     });
 
+    it('should be quick when pushing and poping 0 timeout', function () {
+      var refMs = Date.now();
+      return ctx.execFunc(
+        function () {
+          $.target().pushTimeout(0);
+          var res = $('#not exist');
+          $.target().popTimeout();
+          return res;
+        }
+      ).should.eventually.have.length(0)
+      .then(function () { (Date.now() - refMs).should.be.below(1000); });
+    });
+
     // Skipping because of bug, it takes more than 25 second!
     it.skip('should be quick when grace period is set to 1', function () {
       var refMs = Date.now();

@@ -46,9 +46,10 @@
     var target = $.target();
     target.pushTimeout(0);
     var getTree = function (element) {
-      // if it is a duplicate, we just plug in the original
-      if(element.isDuplicate()) return getTree(element.elements[0]);
-
+      if (element && element.isDuplicate()) {
+        // if it is a duplicate, we just plug in the original
+        return getTree(element.elements()[0]);
+      }
       var subtree = {
         name: element.name()
       , type: element.type()

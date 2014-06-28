@@ -16,8 +16,8 @@
 
   , _returnFirstElem: function (elems) {
       var el;
-      $.each(elems, function(i, _el) {        
-        if(!_el.isDuplicate()) {
+      $.each(elems, function (i, _el) {
+        if (!_el.isDuplicate()) {
           el = _el;
           return false;
         }
@@ -40,9 +40,9 @@
   , _returnElems: function (elems) {
       var results = [];
       elems.each(function (e, el) {
-        if(!el.isDuplicate()){
+        if (!el.isDuplicate()){
           var elid = this.getId(el);
-          results.push({ELEMENT: elid});          
+          results.push({ELEMENT: elid});
         }
       }.bind(this));
 
