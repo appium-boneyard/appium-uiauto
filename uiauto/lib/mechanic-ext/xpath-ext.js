@@ -279,6 +279,9 @@
         }
       }
       if (ret === null) {
+        $.each(elems,function(i, elem) {
+          $(elem).log();
+        });
         ret = this._returnElems($(elems));
       }
       $.target().popTimeout();

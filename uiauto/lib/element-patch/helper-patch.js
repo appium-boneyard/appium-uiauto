@@ -51,13 +51,14 @@
   };
 
   UIAElement.prototype.isDuplicate = function () {
+    var res = false;
     var type = this.type();
     if (type.match(/textfield$/i)) {
-      var elements = this.elements();
-      return (elements.length === 1) &&  elements[0].type() === type &&
-        elements[0].name() === this.name();
+      var parent = this.parent();
+      res = (parent) &&  parent.type() === type &&
+        parent.name() === this.name();
     }
-    return false;
+    return res;
   };
 
   UIAElement.prototype.hasChildren = function () {
