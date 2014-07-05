@@ -1,4 +1,4 @@
-/* globals $, errors */
+/* globals $, STATUS */
 
 (function () {
   $.extend($, {
@@ -24,12 +24,12 @@
       }
       if (value !== null) {
         return {
-          status: errors.Success.code,
+          status: STATUS.Success.code,
           value: value
         };
       } else {
         return {
-          status: errors.UnknownError.code,
+          status: STATUS.UnknownError.code,
           value: 'Unsupported Orientation: ' + orientation
         };
       }
@@ -42,7 +42,7 @@
         $.orientation(UIA_DEVICE_ORIENTATION_PORTRAIT);
       } else {
         return {
-          status: errors.UnknownError.code,
+          status: STATUS.UnknownError.code,
           value: 'Unsupported orientation: ' + orientation
         };
       }
@@ -57,12 +57,12 @@
       }
       if (success) {
         return {
-          status: errors.Success.code
+          status: STATUS.Success.code
         , value: newOrientation
         };
       } else {
         return {
-          status: errors.UnknownError.code
+          status: STATUS.UnknownError.code
         , value: "Orientation change did not take effect: expected " +
             orientation + " but got " + newOrientation
         };
@@ -72,7 +72,7 @@
   , getWindowSize: function () {
       var size = $.target().rect().size;
       return {
-        status: errors.Success.code
+        status: STATUS.Success.code
       , value: size
       };
     }

@@ -1,4 +1,4 @@
-/* globals $, errors */
+/* globals $, STATUS */
 
 (function () {
   $.extend($, {
@@ -7,7 +7,7 @@
     tapById: function (elementId) {
       var element = this.getElement(elementId);
       var errObj = {
-        status: errors.UnknownError.code,
+        status: STATUS.UnknownError.code,
         value: 'elementId ' + elementId + ' could not be tapped'
       };
       if (element !== null) {
@@ -26,12 +26,12 @@
           }
         }
         return {
-          status: errors.Success.code,
+          status: STATUS.Success.code,
           value: null
         };
       } else {
         return {
-          status: errors.UnknownError.code,
+          status: STATUS.UnknownError.code,
           value: 'elementId ' + elementId + ' is null and can\'t be tapped.'
         };
       }
@@ -80,7 +80,7 @@
 
       $.target().dragFromToForDuration(coords[0], coords[1], duration);
       return {
-        status: errors.Success.code,
+        status: STATUS.Success.code,
         value: null
       };
     }
@@ -92,21 +92,21 @@
         var method = 'scroll' + direction[0].toUpperCase() + direction.slice(1);
         el[method]();
         return {
-          status: errors.Success.code,
+          status: STATUS.Success.code,
           value: true
         };
       }.bind(this);
 
-      if (viewRes.status === errors.Success.code) {
+      if (viewRes.status === STATUS.Success.code) {
         return doScroll(viewRes.value.ELEMENT);
       } else {
         viewRes = this.getElementByType('tableview');
-        if (viewRes.status === errors.Success.code) {
+        if (viewRes.status === STATUS.Success.code) {
           return doScroll(viewRes.value.ELEMENT);
         }
       }
       return {
-        status: errors.NoSuchElement.code,
+        status: STATUS.NoSuchElement.code,
         value: null
       };
     }
@@ -116,7 +116,7 @@
 
       $.target().flickFromTo(coords[0], coords[1]);
       return {
-        status: errors.Success.code,
+        status: STATUS.Success.code,
         value: null
       };
     }
@@ -127,7 +127,7 @@
 
       $.target().pinchCloseFromToForDuration(coords[0], coords[1], duration);
       return {
-        status: errors.Success.code,
+        status: STATUS.Success.code,
         value: null
       };
     }
@@ -138,7 +138,7 @@
 
       $.target().pinchOpenFromToForDuration(coords[0], coords[1], duration);
       return {
-        status: errors.Success.code,
+        status: STATUS.Success.code,
         value: null
       };
     }
@@ -196,7 +196,7 @@
       var opts = this.getFlickOpts(xSpeed, ySpeed);
       $.target().flickFromTo(opts[0], opts[1]);
       return {
-        status: errors.Success.code,
+        status: STATUS.Success.code,
         value: null
       };
     }
@@ -210,7 +210,7 @@
       var opts = this.getFlickOpts(xSpeed, ySpeed);
       $.target().dragFromToForDuration(opts[0], opts[1], 1);
       return {
-        status: errors.Success.code,
+        status: STATUS.Success.code,
         value: null
       };
     }

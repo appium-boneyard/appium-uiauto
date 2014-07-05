@@ -3,7 +3,7 @@
 /* jshint ignore:start */
 #import "./vendors/mechanic.js"
 #import "lib/env.js"
-#import "lib/errors.js"
+#import "lib/status.js"
 #import "lib/mechanic-ext/index.js"
 #import "lib/element-patch/index.js"
 #import "lib/commands.js"

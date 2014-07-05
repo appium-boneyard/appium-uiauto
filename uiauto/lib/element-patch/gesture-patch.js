@@ -1,4 +1,4 @@
-/* globals errors */
+/* globals STATUS */
 
 (function () {
 
@@ -17,7 +17,7 @@
 
     this.flickInsideWithOptions(options);
     return {
-      status: errors.Success.code,
+      status: STATUS.Success.code,
       value: null
     };
   };
@@ -61,7 +61,7 @@
 
     this.dragInsideWithOptions(options);
     return {
-      status: errors.Success.code,
+      status: STATUS.Success.code,
       value: null
     };
   };
@@ -72,7 +72,7 @@
 
     this.flickInsideWithOptions(options);
     return {
-      status: errors.Success.code,
+      status: STATUS.Success.code,
       value: null
     };
   };

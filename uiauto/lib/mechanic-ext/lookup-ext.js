@@ -1,4 +1,4 @@
-/* globals errors, $ */
+/* globals STATUS, $ */
 
 (function () {
   $.extend($, {
@@ -36,7 +36,7 @@
   , getElement: function (name) {
       if (typeof this.cache[name] !== 'undefined') {
         if (this.cache[name].isNil()) {
-          throw new Error(errors.StaleElementReference.code);
+          throw new Error(STATUS.StaleElementReference.code);
         }
         return this.cache[name];
       }
@@ -119,12 +119,12 @@
       for (var i = 0; i < actions.length; i++) {
         noElemMock[actions[i]] = errRet;
       }
-      if (elem.status === errors.Success.code) {
+      if (elem.status === STATUS.Success.code) {
         if (typeof elem.value.ELEMENT === "undefined") {
           // we have an array of elements
           if (typeof elem.value[idx] === "undefined") {
             return {
-              status: errors.NoSuchElement.code
+              status: STATUS.NoSuchElement.code
             , value: null
             };
           } else {
@@ -221,7 +221,7 @@
           var elemFocused = $($.cache[key]).isFocused();
           if (elemFocused === true || elemFocused === 1) {
             return {
-              status: errors.Success.code,
+              status: STATUS.Success.code,
               value: {ELEMENT: key}
             };
           }
@@ -231,13 +231,13 @@
         if (foundElement) {
           var varName = $(foundElement).name();
           return {
-            status: errors.Success.code,
+            status: STATUS.Success.code,
             value: {ELEMENT: varName}
           };
         }
 
         return {
-          status: errors.NoSuchElement.code,
+          status: STATUS.NoSuchElement.code,
           value: null,
         };
       }

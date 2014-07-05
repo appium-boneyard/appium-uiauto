@@ -1,4 +1,4 @@
-/* globals $, errors */
+/* globals $, STATUS */
 
 (function () {
   $.extend($, {
@@ -8,7 +8,7 @@
       var alert = $.mainApp().alert();
       if (alert.isNil()) {
         return {
-          status: errors.NoAlertOpenError.code,
+          status: STATUS.NoAlertOpenError.code,
           value: null
         };
       }
@@ -32,7 +32,7 @@
         }
       }
       return {
-        status: errors.Success.code,
+        status: STATUS.Success.code,
         value: text
       };
     }
@@ -40,16 +40,16 @@
   , setAlertText: function (text) {
       var alert = $.mainApp().alert();
       var boxRes = this.getElementByType('textfield', alert);
-      if (boxRes.status === errors.Success.code) {
+      if (boxRes.status === STATUS.Success.code) {
         var el = this.getElement(boxRes.value.ELEMENT);
         el.setValueByType(text);
         return {
-          status: errors.Success.code,
+          status: STATUS.Success.code,
           value: true
         };
       }
       return {
-        status: errors.ElementNotVisible.code,
+        status: STATUS.ElementNotVisible.code,
         value: "Tried to set text of an alert that wasn't a prompt"
       };
     }
@@ -67,7 +67,7 @@
         acceptButton.tap();
         this.waitForAlertToClose(alert);
         return {
-          status: errors.Success.code,
+          status: STATUS.Success.code,
           value: null
         };
       } else {
@@ -75,12 +75,12 @@
         if (ios7AlertButtons.length > 0) {
           ios7AlertButtons[0].tap();
           return {
-            status: errors.Success.code,
+            status: STATUS.Success.code,
             value: null
           };
         } else {
           return {
-            status: errors.UnknownError.code,
+            status: STATUS.UnknownError.code,
             value: null
           };
         }
@@ -89,7 +89,7 @@
 
   , alertIsPresent: function () {
       return {
-        status: errors.Success.code,
+        status: STATUS.Success.code,
         value: !$.mainApp().alert().isNil()
       };
     }
@@ -100,14 +100,14 @@
         alert.cancelButton().tap();
         this.waitForAlertToClose(alert);
         return {
-          status: errors.Success.code,
+          status: STATUS.Success.code,
           value: null
         };
       } else if (!alert.isNil() && alert.buttons().length > 0) {
         alert.buttons()[0].tap(); // first button is dismiss
         this.waitForAlertToClose(alert);
         return {
-          status: errors.Success.code,
+          status: STATUS.Success.code,
           value: null
         };
       } else {
@@ -115,7 +115,7 @@
         if (ios7AlertButtons.length > 0) {
           ios7AlertButtons[ios7AlertButtons.length - 1].tap();
           return {
-            status: errors.Success.code,
+            status: STATUS.Success.code,
             value: null
           };
         } else {

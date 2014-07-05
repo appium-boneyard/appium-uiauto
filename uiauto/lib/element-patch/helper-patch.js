@@ -1,4 +1,4 @@
-/* globals $, errors */
+/* globals $, STATUS */
 
 (function () {
   UIAElement.prototype.setValueByType = function (newValue) {
@@ -102,28 +102,28 @@
 
   UIAElement.prototype.getElementLocation = function () {
     return {
-      status: errors.Success.code,
+      status: STATUS.Success.code,
       value: this.rect().origin
     };
   };
 
   UIAElement.prototype.getElementSize = function () {
     return {
-      status: errors.Success.code,
+      status: STATUS.Success.code,
       value: this.rect().size
     };
   };
 
   UIAElement.prototype.isDisplayed = function () {
     return {
-      status: errors.Success.code,
+      status: STATUS.Success.code,
       value: this.isVisible() === 1
     };
   };
 
   UIAElement.prototype.isSelected = function () {
     return {
-      status: errors.Success.code,
+      status: STATUS.Success.code,
       value: this.value() === 1
     };
   };

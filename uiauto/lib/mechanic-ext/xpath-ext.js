@@ -1,4 +1,4 @@
-/* globals $, errors */
+/* globals $, STATUS */
 
 (function () {
   $.extend($, {
@@ -133,7 +133,7 @@
       var xpObj = this._parseXpath(xpath);
       if (xpObj === false) {
         return {
-          status: errors.XPathLookupError.code
+          status: STATUS.XPathLookupError.code
         , value: null
         };
       } else {
@@ -197,7 +197,7 @@
 
       if (results.value === null || results.value.length < 1) {
         return {
-          status: errors.NoSuchElement.code,
+          status: STATUS.NoSuchElement.code,
           value: null
         };
       } else {
@@ -211,7 +211,7 @@
           }
         }
         return {
-          status: errors.Success.code,
+          status: STATUS.Success.code,
           value: result
         };
       }
@@ -241,13 +241,13 @@
       if (err.message.indexOf("Could not find") !== -1) {
         return {
           status: many ?
-                  errors.StaleElementReference.code :
-                  errors.NoSuchElement.code,
+                  STATUS.StaleElementReference.code :
+                  STATUS.NoSuchElement.code,
           value: err.message
         };
       } else {
         return {
-          status: errors.UnknownError.code,
+          status: STATUS.UnknownError.code,
           value: err.message
         };
       }

@@ -10,7 +10,7 @@
 // <stringified json data> format:
 // {status:<status>, value:<result>}
 
-/* globals $, errors, env */
+/* globals $, STATUS, env */
 
 var commands;
 
@@ -109,7 +109,7 @@ var commands;
         try {
           if (cmd === MORE_COMMAND) {
             result = {
-              status: errors.Success.code,
+              status: STATUS.Success.code,
               type: 'chunk',
             };
           } else {
@@ -124,10 +124,10 @@ var commands;
               }
               $.debug('evaluation finished');
             } catch (possStaleEl) {
-              if (possStaleEl.message === errors.StaleElementReference.code) {
+              if (possStaleEl.message === STATUS.StaleElementReference.code) {
                 result = {
-                  status: errors.StaleElementReference.code,
-                  value: errors.StaleElementReference.summary
+                  status: STATUS.StaleElementReference.code,
+                  value: STATUS.StaleElementReference.summary
                 };
               } else {
                 throw possStaleEl;
@@ -136,7 +136,7 @@ var commands;
           }
         } catch (e) {
           result = {
-            status: errors.JavaScriptError.code
+            status: STATUS.JavaScriptError.code
           , value: e.message
           };
         }
@@ -147,7 +147,7 @@ var commands;
         if (typeof result.status === "undefined" || typeof result.status === "object") {
           $.debug("Result is not protocol compliant, wrapping");
           result = {
-            status: errors.Success.code,
+            status: STATUS.Success.code,
             value: result
           };
         }

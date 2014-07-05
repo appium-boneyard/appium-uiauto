@@ -1,4 +1,4 @@
-/* globals $, errors */
+/* globals $, STATUS */
 
 (function () {
   $.extend($, {
@@ -10,7 +10,7 @@
         $.keyboard().typeString(keys);
       }
       return {
-        status: errors.Success.code,
+        status: STATUS.Success.code,
         value: null
       };
     }
@@ -30,7 +30,7 @@
         this.typeKey(keys.charAt(i));
       }
       return {
-        status: errors.Success.code,
+        status: STATUS.Success.code,
         value: null
       };
     }
@@ -68,7 +68,7 @@
             keys[keyName].tap();
           } catch (e) {
             return {
-              status: errors.NoSuchElement.code,
+              status: STATUS.NoSuchElement.code,
               value: "Could not find the '" + keyName + "' key."
             };
           }

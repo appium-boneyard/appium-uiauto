@@ -1,4 +1,4 @@
-/* globals $, errors */
+/* globals $, STATUS */
 
 (function () {
   $.extend($, {
@@ -26,13 +26,13 @@
         var elid = this.getId(el);
 
         return {
-          status: errors.Success.code,
+          status: STATUS.Success.code,
           value: {'ELEMENT': elid }
         };
       } else {
         return {
-          status: errors.NoSuchElement.code,
-          value: errors.NoSuchElement.summary
+          status: STATUS.NoSuchElement.code,
+          value: STATUS.NoSuchElement.summary
         };
       }
     }
@@ -47,7 +47,7 @@
       }.bind(this));
 
       return {
-        status: errors.Success.code,
+        status: STATUS.Success.code,
         value: results
       };
     }
@@ -113,12 +113,12 @@
         // indicators never went away...
         $.debug("WARNING: Waited for indicators to become non-visible but they never did, moving on");
         return {
-          status: errors.UnknownError.code,
+          status: STATUS.UnknownError.code,
           value: "Timed out waiting on activity indicator."
         };
       }
       return {
-        status: errors.Success.code,
+        status: STATUS.Success.code,
         value: null
       };
     }

@@ -1,9 +1,10 @@
+/* global $ */
 "use strict";
 
-var errors;
+var STATUS, ERROR;
 
 (function () {
-  errors = {
+  STATUS = {
     Success: {
       code: 0,
       summary: 'The command executed successfully.'
@@ -110,6 +111,13 @@ var errors;
     }
   };
 
+  ERROR = {};
+  $.each(STATUS, function (key, status) {
+    if (status.code > 0) {
+      var error = new Error(status.summary);
+      error.code = status.code;
+      ERROR[key] = error;
+    }
+  });
 
 })();
-

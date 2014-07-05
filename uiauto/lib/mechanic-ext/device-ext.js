@@ -1,4 +1,4 @@
-/* globals $, errors */
+/* globals $, STATUS */
 
 (function () {
   $.extend($, {
@@ -20,13 +20,13 @@
           UIATarget.localTarget().frontMostApp().windows()[0].toolbar().buttons()[0].tap();
         } catch (e) {
           return {
-            status: errors.UnknownError.code,
+            status: STATUS.UnknownError.code,
             value: "Back button is null and can't be tapped."
           };
         }
       }
       return {
-        status: errors.Success.code,
+        status: STATUS.Success.code,
         value: null
       };
     }
