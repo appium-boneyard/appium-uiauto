@@ -58,6 +58,7 @@ var commands;
         prepareChunk(args);
       } else {
         var stringResult = JSON.stringify(result);
+        $.debug('responding with:' + stringResult.substring(300));
         if (stringResult.length < BIG_DATA_THRESHOLD){
           // regular small results
           args.push(MESSAGE_TYPES.indexOf('regular') + ',' + stringResult);
@@ -98,6 +99,73 @@ var commands;
     return sendResultAndGetNext();
   };
 
+  function buildOkResult(rawRes) {
+    // Type return mapping is the following:
+    // - UIAElement (excluding UIAElementArray and UIAElementNil)
+    //   --> return a single element id
+    // - UIAElementNil, null, undefined --> ''
+    // - UIAElementArray, mechanic wrap, Elements Arrays
+    //   --> return array of element ids
+    // - else --> return result as it is
+
+    // converting UIAElementArray to mechanic wrap
+    if (rawRes instanceof UIAElementArray){
+      rawRes = $.smartWrap(rawRes);
+    }
+    // converting array of UIAElement to mechanic wrap
+    if (Array.isArray(rawRes) && rawRes.length > 0){
+      try {
+        rawRes = $.smartWrap(rawRes);
+      } catch (ign) {
+        // not an array of elements, ignoring
+      }
+    }
+    // build result object
+    if (rawRes === UIAElementNil || rawRes instanceof UIAElementNil ||
+      rawRes === null || rawRes === undefined) {
+      return {
+        status: STATUS.Success.code,
+        value: ''
+      };
+    } else if (rawRes instanceof UIAElement) {
+      var elid = $.getId(rawRes);
+      return {
+        status: STATUS.Success.code,
+        value: {'ELEMENT': elid }
+      };
+    } else if (rawRes.isMechanic === true) {
+      var elIds = [];
+      $(rawRes).each(function (idx, el) {
+        var elid = $.getId(el);
+        elIds.push({'ELEMENT': elid });
+      });
+      return {
+        status: STATUS.Success.code,
+        value: elIds
+      };
+    } else {
+      return {
+        status: STATUS.Success.code,
+        value: rawRes
+      };
+    }
+  }
+
+  function buildErrorResult (err) {
+    $.error('Error during eval: ' + err.stack);
+    if (err.isAppium) {
+      return {
+        status: err.code,
+        value: err.message
+      };
+    } else {
+      return {
+        status: STATUS.JavaScriptError.code
+      , value: err.message
+      };
+    }
+  }
+
   commands.startProcessing = function () {
     // let server know we're alive and get first command
     var cmd = getFirstCommand();
@@ -106,50 +174,22 @@ var commands;
       if (cmd) {
         var result;
         $.debug("Got new command " + curAppiumCmdId + " from instruments: " + cmd);
-        try {
-          if (cmd === MORE_COMMAND) {
-            result = {
-              status: STATUS.Success.code,
-              type: 'chunk',
-            };
-          } else {
-            /* jshint evil:true */
-            try {
-              $.debug('evaluating ' + cmd);
-              try {
-                result = eval(cmd);
-              } catch (err) {
-                $.error('Error during eval: ' + err.stack);
-                throw err;
-              }
-              $.debug('evaluation finished');
-            } catch (possStaleEl) {
-              if (possStaleEl.message === STATUS.StaleElementReference.code) {
-                result = {
-                  status: STATUS.StaleElementReference.code,
-                  value: STATUS.StaleElementReference.summary
-                };
-              } else {
-                throw possStaleEl;
-              }
-            }
-          }
-        } catch (e) {
-          result = {
-            status: STATUS.JavaScriptError.code
-          , value: e.message
-          };
-        }
-        if (typeof result === "undefined" || result === null) {
-          result = '';
-          $.debug("Command executed without response");
-        }
-        if (typeof result.status === "undefined" || typeof result.status === "object") {
-          $.debug("Result is not protocol compliant, wrapping");
+        if (cmd === MORE_COMMAND) {
           result = {
             status: STATUS.Success.code,
-            value: result
+            type: 'chunk',
           };
+        } else {
+          /* jshint evil:true */
+          try {
+            $.debug('evaluating ' + cmd);
+            var rawRes = eval(cmd);
+            $.debug('evaluation finished');
+            result = buildOkResult(rawRes);
+          } catch (err) {
+            $.error(err.toString());
+            result = buildErrorResult(err);
+          }
         }
         cmd = sendResultAndGetNext(result);
       } else {

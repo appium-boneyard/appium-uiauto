@@ -114,9 +114,12 @@ var STATUS, ERROR;
   ERROR = {};
   $.each(STATUS, function (key, status) {
     if (status.code > 0) {
-      var error = new Error(status.summary);
-      error.code = status.code;
-      ERROR[key] = error;
+      ERROR[key] = function (mess) {
+        var error = new Error(mess || status.summary);
+        error.code = status.code;
+        error.isAppium = true;
+        return error;
+      };
     }
   });
 

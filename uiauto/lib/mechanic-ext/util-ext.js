@@ -14,44 +14,6 @@
     }
   }
 
-  , _returnFirstElem: function (elems) {
-      var el;
-      $.each(elems, function (i, _el) {
-        if (!_el.isDuplicate()) {
-          el = _el;
-          return false;
-        }
-      });
-      if (el) {
-        var elid = this.getId(el);
-
-        return {
-          status: STATUS.Success.code,
-          value: {'ELEMENT': elid }
-        };
-      } else {
-        return {
-          status: STATUS.NoSuchElement.code,
-          value: STATUS.NoSuchElement.summary
-        };
-      }
-    }
-
-  , _returnElems: function (elems) {
-      var results = [];
-      elems.each(function (e, el) {
-        if (!el.isDuplicate()){
-          var elid = this.getId(el);
-          results.push({ELEMENT: elid});
-        }
-      }.bind(this));
-
-      return {
-        status: STATUS.Success.code,
-        value: results
-      };
-    }
-
   , convertSelector: function (selector) {
       // some legacy: be backwards compatible, mechanic.js
       switch (selector) {
@@ -112,15 +74,46 @@
       if (!done) {
         // indicators never went away...
         $.debug("WARNING: Waited for indicators to become non-visible but they never did, moving on");
-        return {
-          status: STATUS.UnknownError.code,
-          value: "Timed out waiting on activity indicator."
-        };
+        throw new STATUS.UnknownError("Timed out waiting on activity indicator.");
       }
-      return {
-        status: STATUS.Success.code,
-        value: null
-      };
+    }
+
+  , smartWrap: function (obj) {
+      if (obj === null || typeof obj === 'undefined' ) {
+        return $([]);
+      } else if (obj.isMechanic === true) {
+        return obj;
+      } else if (obj === UIAElementNil || obj instanceof UIAElementNil) {
+        return $([]);
+      } else if (obj instanceof UIAElementArray) {
+        return $(obj.toArray());
+      } else if (obj instanceof UIAElement) {
+        return $(obj);
+      } else if (Array.isArray(obj)) {
+        var allUIA = true;
+        $.each(obj, function (idx, el) {
+          allUIA = allUIA && el instanceof UIAElement;
+          return allUIA;
+        });
+        if (allUIA) return $(obj);
+      } else {
+        throw new Error('smartWrap failed,');
+      }
     }
   });
+
+  $.extend($.fn, {
+    isMechanic: true,
+    dedup: function () {
+      var results = [];
+      this.each(function (idx, el) {
+        if (!el.isDuplicate()){
+          results.push(el);
+        }
+      });
+      return $.smartWrap(results);
+    }
+
+  });
+
 })();

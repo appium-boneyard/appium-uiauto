@@ -1,5 +1,3 @@
-/* globals STATUS */
-
 (function () {
 
   // does a flick from a center of a specified element (use case: sliders)
@@ -16,10 +14,6 @@
     };
 
     this.flickInsideWithOptions(options);
-    return {
-      status: STATUS.Success.code,
-      value: null
-    };
   };
 
   UIAElement.prototype.getRelCoords = function (startX, startY, endX, endY) {
@@ -60,10 +54,6 @@
     options.duration = parseFloat(duration);
 
     this.dragInsideWithOptions(options);
-    return {
-      status: STATUS.Success.code,
-      value: null
-    };
   };
 
   UIAElement.prototype.flick = function (startX, startY, endX, endY, touchCount) {
@@ -71,10 +61,6 @@
     options.touchCount = touchCount;
 
     this.flickInsideWithOptions(options);
-    return {
-      status: STATUS.Success.code,
-      value: null
-    };
   };
 
   UIAElement.prototype.complexTap = function (opts) {

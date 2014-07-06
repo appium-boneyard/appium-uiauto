@@ -11,20 +11,20 @@
     ];
     var elems = this._elementOrElementsWithPredicateWeighted(predicate,
                   weighting, true);
-    return $._returnFirstElem($(elems));
+    return $.smartWrap(elems).dedup()[0];
   };
 
   UIAElement.prototype.getFirstWithPredicate = function (predicate, onlyVisible) {
     var weighting = ['elements'];
     var elems = this._elementOrElementsWithPredicateWeighted(
                   predicate, weighting, true, onlyVisible);
-    return $._returnFirstElem($(elems));
+    return $.smartWrap(elems).dedup()[0];
   };
 
   UIAElement.prototype.getAllWithPredicate = function (predicate, onlyVisible) {
     var weighting = ['elements'];
     var elems = this._elementOrElementsWithPredicateWeighted(predicate, weighting, false, onlyVisible);
-    return $._returnElems($(elems));
+    return $.smartWrap(elems).dedup();
   };
 
   UIAElement.prototype._elementOrElementsWithPredicateWeighted = function (predicate, weighting, onlyFirst, onlyVisible) {

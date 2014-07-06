@@ -1,4 +1,4 @@
-/* globals $, STATUS */
+/* globals $, ERROR */
 
 (function () {
   $.extend($, {
@@ -132,10 +132,7 @@
 
       var xpObj = this._parseXpath(xpath);
       if (xpObj === false) {
-        return {
-          status: STATUS.XPathLookupError.code
-        , value: null
-        };
+        throw new ERROR.XPathLookupError();
       } else {
         $.target().pushTimeout(0);
         elems = $(_ctx);
@@ -188,32 +185,25 @@
     }
 
   , getElementsByXpath: function (xpath, ctx) {
-      return this._returnElems(this._getElementsByXpath(xpath, ctx));
+      var elems = this._getElementsByXpath(xpath, ctx);
+      return $.smartWrap(elems).dedup();
     }
 
   , getElementByXpath: function (xpath, ctx) {
 
       var results = this.getElementsByXpath(xpath, ctx);
 
-      if (results.value === null || results.value.length < 1) {
-        return {
-          status: STATUS.NoSuchElement.code,
-          value: null
-        };
+      if (results.length < 1) {
+        throw new ERROR.NoSuchElement();
       } else {
-        var result = results.value[0];
-        for (var a = 0, len = results.value.length; a < len; a++) {
-          var elId = results.value[a].ELEMENT;
-          var elVis = this.getElement(elId).isVisible();
-          if (elVis === 1) {
-            result = results.value[a];
+        var result = results[0];
+        for (var a = 0, len = results.length; a < len; a++) {
+          if (results[a].isVisible()) {
+            result = results[a];
             break;
           }
         }
-        return {
-          status: STATUS.Success.code,
-          value: result
-        };
+        return result;
       }
     }
 
@@ -239,17 +229,10 @@
 
   , _handleIndexPathError: function (err, many) {
       if (err.message.indexOf("Could not find") !== -1) {
-        return {
-          status: many ?
-                  STATUS.StaleElementReference.code :
-                  STATUS.NoSuchElement.code,
-          value: err.message
-        };
+        throw many ? new ERROR.StaleElementReference(err.message) :
+          ERROR.NoSuchElement(err.message);
       } else {
-        return {
-          status: STATUS.UnknownError.code,
-          value: err.message
-        };
+        throw ERROR.UnknownError(err.message);
       }
     }
 
@@ -258,7 +241,7 @@
       var ret;
       try {
         var elem = this._getElementByIndexPath(path, ctx);
-        ret = this._returnFirstElem($([elem]));
+        ret = $(elem).dedup()[0];
       } catch (err) {
         ret = this._handleIndexPathError(err, false);
       }
@@ -282,7 +265,7 @@
         $.each(elems,function (i, elem) {
           $(elem).log();
         });
-        ret = this._returnElems($(elems));
+        ret = $.smartWrap(elems).dedup();
       }
       $.target().popTimeout();
       return ret;

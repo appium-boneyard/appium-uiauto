@@ -1,4 +1,4 @@
-/* globals $, STATUS */
+/* globals $, ERROR */
 
 (function () {
   $.extend($, {
@@ -7,51 +7,36 @@
     getAlertText: function () {
       var alert = $.mainApp().alert();
       if (alert.isNil()) {
-        return {
-          status: STATUS.NoAlertOpenError.code,
-          value: null
-        };
+        throw new ERROR.NoAlertOpenError();
       }
 
-      var textRes = this.getElementsByType('text', alert);
+      var texts = this.getElementsByType('text', alert);
       // If an alert does not have a title, alert.name() is null, use empty string
       var text = alert.name() || "";
-      if (textRes.value.length > 1) {
+      if (texts.length > 1) {
         // Safari alerts have the URL as a title
         if (text.indexOf('http') === 0 || text === "") {
-          textId = textRes.value[textRes.value.length - 1].ELEMENT;
-          text = this.getElement(textId).name();
+          text = texts.last().name();
         } else {
-          var textId = textRes.value[textRes.value.length - 2].ELEMENT;
-          text = this.getElement(textId).name();
-          textId = textRes.value[textRes.value.length - 1].ELEMENT;
-          var subtext = this.getElement(textId).name();
+          text = texts[texts.length - 2].name();
+          var subtext = texts.last().name();
           if (subtext !== null) {
             text = text + ' ' + subtext;
           }
         }
       }
-      return {
-        status: STATUS.Success.code,
-        value: text
-      };
+      return text;
     }
 
   , setAlertText: function (text) {
       var alert = $.mainApp().alert();
-      var boxRes = this.getElementByType('textfield', alert);
-      if (boxRes.status === STATUS.Success.code) {
-        var el = this.getElement(boxRes.value.ELEMENT);
+      var el = this.getElementByType('textfield', alert);
+      if (el) {
         el.setValueByType(text);
-        return {
-          status: STATUS.Success.code,
-          value: true
-        };
+      } else {
+        throw new ERROR.ElementNotVisible(
+          "Tried to set text of an alert that wasn't a prompt");
       }
-      return {
-        status: STATUS.ElementNotVisible.code,
-        value: "Tried to set text of an alert that wasn't a prompt"
-      };
     }
 
   , acceptAlert: function () {
@@ -63,35 +48,20 @@
           // last button is accept
           acceptButton = alert.buttons()[buttonCount - 1];
         }
-
         acceptButton.tap();
         this.waitForAlertToClose(alert);
-        return {
-          status: STATUS.Success.code,
-          value: null
-        };
       } else {
         var ios7AlertButtons = this._getElementsByXpath("actionsheet/button");
         if (ios7AlertButtons.length > 0) {
           ios7AlertButtons[0].tap();
-          return {
-            status: STATUS.Success.code,
-            value: null
-          };
         } else {
-          return {
-            status: STATUS.UnknownError.code,
-            value: null
-          };
+          throw new ERROR.UnknownError();
         }
       }
     }
 
   , alertIsPresent: function () {
-      return {
-        status: STATUS.Success.code,
-        value: !$.mainApp().alert().isNil()
-      };
+      return !$.mainApp().alert().isNil();
     }
 
   , dismissAlert: function () {
@@ -99,25 +69,13 @@
       if (!alert.isNil() && !alert.cancelButton().isNil()) {
         alert.cancelButton().tap();
         this.waitForAlertToClose(alert);
-        return {
-          status: STATUS.Success.code,
-          value: null
-        };
       } else if (!alert.isNil() && alert.buttons().length > 0) {
         alert.buttons()[0].tap(); // first button is dismiss
         this.waitForAlertToClose(alert);
-        return {
-          status: STATUS.Success.code,
-          value: null
-        };
       } else {
         var ios7AlertButtons = this._getElementsByXpath("actionsheet/button");
         if (ios7AlertButtons.length > 0) {
           ios7AlertButtons[ios7AlertButtons.length - 1].tap();
-          return {
-            status: STATUS.Success.code,
-            value: null
-          };
         } else {
           return this.acceptAlert();
         }

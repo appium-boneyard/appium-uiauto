@@ -1,4 +1,4 @@
-/* globals $, STATUS */
+/* globals $, ERROR */
 
 (function () {
   $.extend($, {
@@ -23,15 +23,9 @@
           break;
       }
       if (value !== null) {
-        return {
-          status: STATUS.Success.code,
-          value: value
-        };
+        return value;
       } else {
-        return {
-          status: STATUS.UnknownError.code,
-          value: 'Unsupported Orientation: ' + orientation
-        };
+        throw new ERROR.UnknownError('Unsupported Orientation: ' + orientation);
       }
     }
 
@@ -41,40 +35,28 @@
       } else if (orientation === "PORTRAIT") {
         $.orientation(UIA_DEVICE_ORIENTATION_PORTRAIT);
       } else {
-        return {
-          status: STATUS.UnknownError.code,
-          value: 'Unsupported orientation: ' + orientation
-        };
+        throw new ERROR.UnknownError('Unsupported orientation: ' + orientation);
       }
       var newOrientation;
       var success = false;
       var i = 0;
       while (!success && i < 20) {
-        newOrientation = this.getScreenOrientation().value;
+        newOrientation = this.getScreenOrientation();
         success = newOrientation === orientation;
         $.system().performTaskWithPathArgumentsTimeout("/bin/sleep", ['0.1'], 1);
         i++;
       }
       if (success) {
-        return {
-          status: STATUS.Success.code
-        , value: newOrientation
-        };
+        return newOrientation;
       } else {
-        return {
-          status: STATUS.UnknownError.code
-        , value: "Orientation change did not take effect: expected " +
-            orientation + " but got " + newOrientation
-        };
+        throw new ERROR.UnknownError("Orientation change did not take effect: expected " +
+          orientation + " but got " + newOrientation);
       }
     }
 
   , getWindowSize: function () {
       var size = $.target().rect().size;
-      return {
-        status: STATUS.Success.code
-      , value: size
-      };
+      return size;
     }
 
   , getWindowIndicators: function (win) {

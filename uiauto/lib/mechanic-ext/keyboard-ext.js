@@ -1,4 +1,4 @@
-/* globals $, STATUS */
+/* globals $, ERROR */
 
 (function () {
   $.extend($, {
@@ -9,10 +9,6 @@
       } else {
         $.keyboard().typeString(keys);
       }
-      return {
-        status: STATUS.Success.code,
-        value: null
-      };
     }
 
   , hasSpecialKeys: function (keys) {
@@ -29,10 +25,6 @@
       for (var i = 0; i < numChars; i++){
         this.typeKey(keys.charAt(i));
       }
-      return {
-        status: STATUS.Success.code,
-        value: null
-      };
     }
 
     // handles some of the special keys in org.openqa.selenium.Keys
@@ -67,10 +59,8 @@
             var keys = $.keyboard().buttons();
             keys[keyName].tap();
           } catch (e) {
-            return {
-              status: STATUS.NoSuchElement.code,
-              value: "Could not find the '" + keyName + "' key."
-            };
+            throw new ERROR.NoSuchElement(
+              "Could not find the '" + keyName + "' key.");
           }
           $.delay(1000);
           break;

@@ -1,4 +1,4 @@
-/* globals $, STATUS */
+/* globals $, ERROR */
 
 (function () {
   $.extend($, {
@@ -6,10 +6,8 @@
     // Gesture functions
     tapById: function (elementId) {
       var element = this.getElement(elementId);
-      var errObj = {
-        status: STATUS.UnknownError.code,
-        value: 'elementId ' + elementId + ' could not be tapped'
-      };
+      var errObj = new ERROR.UnknownError(
+        'elementId ' + elementId + ' could not be tapped');
       if (element !== null) {
         try {
           // element may still be null.
@@ -19,21 +17,15 @@
             try {
               $.target().tap(element.rect());
             } catch (e2) {
-              return errObj;
+              throw errObj;
             }
           } else {
-            return errObj;
+            throw errObj;
           }
         }
-        return {
-          status: STATUS.Success.code,
-          value: null
-        };
       } else {
-        return {
-          status: STATUS.UnknownError.code,
-          value: 'elementId ' + elementId + ' is null and can\'t be tapped.'
-        };
+        throw new ERROR.UnknownError(
+          'elementId ' + elementId + ' is null and can\'t be tapped.');
       }
     }
 
@@ -79,46 +71,26 @@
       duration = parseFloat(duration);
 
       $.target().dragFromToForDuration(coords[0], coords[1], duration);
-      return {
-        status: STATUS.Success.code,
-        value: null
-      };
     }
 
   , scrollFirstView: function (direction) {
-      var viewRes = this.getElementByType('scrollview');
-      var doScroll = function (elId) {
-        var el = this.getElement(elId);
+      var doScroll = function (el) {
         var method = 'scroll' + direction[0].toUpperCase() + direction.slice(1);
         el[method]();
-        return {
-          status: STATUS.Success.code,
-          value: true
-        };
       }.bind(this);
-
-      if (viewRes.status === STATUS.Success.code) {
-        return doScroll(viewRes.value.ELEMENT);
-      } else {
-        viewRes = this.getElementByType('tableview');
-        if (viewRes.status === STATUS.Success.code) {
-          return doScroll(viewRes.value.ELEMENT);
-        }
+      try {
+        var viewEl = this.getElementByType('scrollview');
+        return doScroll(viewEl);
+      } catch (err) {
+        viewEl = this.getElementByType('tableview');
+        return doScroll(viewEl);
       }
-      return {
-        status: STATUS.NoSuchElement.code,
-        value: null
-      };
     }
 
   , flickApp: function (startX, startY, endX, endY) {
       var coords = this.getAbsCoords(startX, startY, endX, endY);
 
       $.target().flickFromTo(coords[0], coords[1]);
-      return {
-        status: STATUS.Success.code,
-        value: null
-      };
     }
 
   , pinchClose: function (startX, startY, endX, endY, duration) {
@@ -126,10 +98,6 @@
       duration = parseFloat(duration);
 
       $.target().pinchCloseFromToForDuration(coords[0], coords[1], duration);
-      return {
-        status: STATUS.Success.code,
-        value: null
-      };
     }
 
   , pinchOpen: function (startX, startY, endX, endY, duration) {
@@ -137,10 +105,6 @@
       duration = parseFloat(duration);
 
       $.target().pinchOpenFromToForDuration(coords[0], coords[1], duration);
-      return {
-        status: STATUS.Success.code,
-        value: null
-      };
     }
 
   , complexTap: function (opts) {
@@ -195,10 +159,6 @@
       // has length .25
       var opts = this.getFlickOpts(xSpeed, ySpeed);
       $.target().flickFromTo(opts[0], opts[1]);
-      return {
-        status: STATUS.Success.code,
-        value: null
-      };
     }
 
     // similar to flick but does a longer movement in the direction of the swipe
@@ -209,10 +169,6 @@
       // has length .50
       var opts = this.getFlickOpts(xSpeed, ySpeed);
       $.target().dragFromToForDuration(opts[0], opts[1], 1);
-      return {
-        status: STATUS.Success.code,
-        value: null
-      };
     }
 
   });

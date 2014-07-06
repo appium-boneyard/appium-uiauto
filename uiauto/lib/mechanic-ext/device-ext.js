@@ -1,4 +1,4 @@
-/* globals $, STATUS */
+/* globals $, ERROR */
 
 (function () {
   $.extend($, {
@@ -19,16 +19,9 @@
           // Press "Cancel" on Apptentive
           UIATarget.localTarget().frontMostApp().windows()[0].toolbar().buttons()[0].tap();
         } catch (e) {
-          return {
-            status: STATUS.UnknownError.code,
-            value: "Back button is null and can't be tapped."
-          };
+          throw new ERROR.UnknownError("Back button is null and can't be tapped.");
         }
       }
-      return {
-        status: STATUS.Success.code,
-        value: null
-      };
     }
 
   , lock: function (secs) {

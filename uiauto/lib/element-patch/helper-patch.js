@@ -101,32 +101,19 @@
   };
 
   UIAElement.prototype.getElementLocation = function () {
-    return {
-      status: STATUS.Success.code,
-      value: this.rect().origin
-    };
+    return this.rect().origin;
   };
 
   UIAElement.prototype.getElementSize = function () {
-    return {
-      status: STATUS.Success.code,
-      value: this.rect().size
-    };
+    return this.rect().size;
   };
 
   UIAElement.prototype.isDisplayed = function () {
-    return {
-      status: STATUS.Success.code,
-      value: this.isVisible() === 1
-    };
+    return this.isVisible() === 1;
   };
 
   UIAElement.prototype.isSelected = function () {
-    return {
-      status: STATUS.Success.code,
-      value: this.value() === 1
-    };
+    return this.value() === 1;
   };
 
 })();
-

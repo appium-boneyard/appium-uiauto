@@ -1,4 +1,4 @@
-/* globals STATUS, $ */
+/* globals ERROR, $ */
 
 (function () {
   $.extend($, {
@@ -36,11 +36,10 @@
   , getElement: function (name) {
       if (typeof this.cache[name] !== 'undefined') {
         if (this.cache[name].isNil()) {
-          throw new Error(STATUS.StaleElementReference.code);
+          throw new Error.StaleElementReference();
         }
         return this.cache[name];
       }
-
       return null;
     }
 
@@ -97,7 +96,7 @@
   , getElementById: function (sel) {
       var exactPred = this._getIdSearchPredicate(sel, true);
       var exact = $.mainApp().getFirstWithPredicateWeighted(exactPred);
-      if (exact && exact.status === 0) {
+      if (exact) {
         return exact;
       } else {
         var pred = this._getIdSearchPredicate(sel, false);
@@ -110,51 +109,20 @@
       return $.mainApp().getAllWithPredicate(pred);
     }
 
-  , elemForAction: function (elem, idx) {
-      // mock out action functions to respond with the error
-      var errRet = function () { return elem; };
-      var noElemMock = {};
-      var actions = ["tap", "isEnabled", "isValid", "isVisible", "value",
-                     "name", "label", "setValue"];
-      for (var i = 0; i < actions.length; i++) {
-        noElemMock[actions[i]] = errRet;
-      }
-      if (elem.status === STATUS.Success.code) {
-        if (typeof elem.value.ELEMENT === "undefined") {
-          // we have an array of elements
-          if (typeof elem.value[idx] === "undefined") {
-            return {
-              status: STATUS.NoSuchElement.code
-            , value: null
-            };
-          } else {
-            return this.getElement(elem.value[idx].ELEMENT);
-          }
-        } else {
-          return this.getElement(elem.value.ELEMENT);
-        }
-      } else {
-        return noElemMock;
-      }
-    }
-
   , _getElementsByType: function (type, ctx) {
       var selector = this.convertSelector(type);
       var elems = this.lookup(selector, ctx);
-
-      return elems;
+      return $.smartWrap(elems);
     }
 
   , getElementsByType: function (type, ctx) {
       var elems = this._getElementsByType(type, ctx);
-
-      return this._returnElems($(elems));
+      return $.smartWrap(elems).dedup();
     }
 
   , getElementByType: function (type, ctx) {
       var elems = this._getElementsByType(type, ctx);
-
-      return this._returnFirstElem($(elems));
+      return $.smartWrap(elems).dedup()[0];
     }
 
   , getActiveElement: function () {
@@ -163,11 +131,12 @@
 
   , getElementByUIAutomation: function (selectorCode, ctx) {
       var elems = this._getElementsByUIAutomation(selectorCode, ctx);
-      return this._returnFirstElem($(elems));
+      return $.smartWrap(elems).dedup()[0];
     }
   , getElementsByUIAutomation: function (selectorCode, ctx) {
       var elems = this._getElementsByUIAutomation(selectorCode, ctx);
-      return this._returnElems($(elems));
+      elems = $.smartWrap(elems);
+      return elems.dedup();
     }
   , _getElementsByUIAutomation: function (selectorCode, ctx) {
       /* jshint evil: true */
@@ -186,17 +155,8 @@
 
       //convert the string we were given into the element we want
       var elems = eval("rootElement" + selectorCode);
-      if (elems instanceof UIAElementNil) {
-        return [];
-      } else if (elems instanceof UIAElementArray) {
-        //tricky: UIAutomation returns UIElementArray objects, not standard js array. Mechanic.js expects objects of type Array
-        return elems.toArray();
-      } else {
-        return [elems];
-      }
+      return $.smartWrap(elems);
     }
-
-
   });
 
   $.extend($.fn, {
@@ -220,26 +180,16 @@
         for (var key in $.cache) {
           var elemFocused = $($.cache[key]).isFocused();
           if (elemFocused === true || elemFocused === 1) {
-            return {
-              status: STATUS.Success.code,
-              value: {ELEMENT: key}
-            };
+            return $.cache[key];
           }
         }
         foundElement = checkAll(this);
 
         if (foundElement) {
-          var varName = $(foundElement).name();
-          return {
-            status: STATUS.Success.code,
-            value: {ELEMENT: varName}
-          };
+          return foundElement;
+        } else {
+          throw new ERROR.NoSuchElement();
         }
-
-        return {
-          status: STATUS.NoSuchElement.code,
-          value: null,
-        };
       }
   });
 
