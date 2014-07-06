@@ -1,4 +1,4 @@
-/* globals $, STATUS */
+/* globals $ */
 
 (function () {
   UIAElement.prototype.setValueByType = function (newValue) {
