@@ -136,25 +136,25 @@
   , getElementsByUIAutomation: function (selectorCode, ctx) {
       var elems = this._getElementsByUIAutomation(selectorCode, ctx);
       elems = $.smartWrap(elems);
-      return elems.dedup();
+      return $.smartWrap(elems).dedup();
     }
   , _getElementsByUIAutomation: function (selectorCode, ctx) {
-      /* jshint evil: true */
-      var rootElement = this.mainWindow();
+      if (!selectorCode) throw new Error('No code provided.');
 
-      if (typeof ctx === 'string') {
-        rootElement = this.cache[ctx];
-      } else if (typeof ctx !== 'undefined') {
-        rootElement = ctx;
-      }
-
-      //There may not be a '.' at the beginning of the string, add for convenience
+      var code;
       if (selectorCode[0] !== '.') {
-        selectorCode = '.' + selectorCode;
+        code = selectorCode;
+      } else if (ctx === null || typeof ctx === 'undefined') {
+        code = 'this.mainWindow()' + selectorCode;
+      } else if (typeof ctx === 'string') {
+        code = '$.getElement(\'' + ctx + '\')' + selectorCode;
+      } else {
+        code = 'ctx' + selectorCode;
       }
 
-      //convert the string we were given into the element we want
-      var elems = eval("rootElement" + selectorCode);
+      $.debug('byUIAutomation: evaluating code: ' + code);
+      /* jshint evil: true */
+      var elems = eval(code);
       return $.smartWrap(elems);
     }
   });
