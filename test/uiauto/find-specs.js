@@ -80,6 +80,20 @@ describe('find', function () {
       });
     });
 
+    it('should eval the raw code if it doesn\'t start with a dot', function () {
+      return ctx.execFunc(
+        function () {
+          rootPage.clickMenuItem('Text Fields');
+          $.delay(2000);
+          var res = $.getElementsByUIAutomation('$.getElementByType(\'UIATableCell\').getAllWithPredicate("type contains[c] \'textfield\'", true)');
+          return res;
+        }
+      ).then(function (res) {
+        res.should.have.length(1);
+        res[0].ELEMENT.should.exist;
+      });
+    });
+
     it('should retrieve context from cache when ctx param is a string', function () {
       return ctx.execFunc(
         function () {
@@ -122,10 +136,13 @@ describe('find', function () {
         function () {
           rootPage.clickMenuItem('Text Fields');
           $.delay(2000);
-          var res = [], parent;
-          var el = $.getElementByUIAutomation(
+          var res = [], parent, el;
+          el = $.getElementByUIAutomation(
             '.getAllWithPredicate("type contains[c] \'textfield\'", true)'
           );
+          res.push(el);
+
+          el = $.getElementByUIAutomation('$.getElementByType(\'UIATableCell\').getAllWithPredicate("type contains[c] \'textfield\'", true)');
           res.push(el);
 
           parent = $.getElementsByType('UIATableCell')[1];
@@ -146,7 +163,7 @@ describe('find', function () {
           return res;
         }
       ).then(function (res) {
-        res.should.have.length(3);
+        res.should.have.length(4);
         res[0].ELEMENT.should.exist;
       });
     });

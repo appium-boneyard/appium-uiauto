@@ -145,7 +145,7 @@
       if (selectorCode[0] !== '.') {
         code = selectorCode;
       } else if (ctx === null || typeof ctx === 'undefined') {
-        code = 'this.mainWindow()' + selectorCode;
+        code = '$.mainWindow()' + selectorCode;
       } else if (typeof ctx === 'string') {
         code = '$.getElement(\'' + ctx + '\')' + selectorCode;
       } else {
