@@ -28,7 +28,9 @@ describe('dynamic bootstrap', function () {
     var env = envFromCode(code);
     env.nodePath.should.equal(process.execPath);
     env.commandProxyClientPath.should.exist;
+    env.instrumentsSock.should.exist;
     fs.existsSync(env.commandProxyClientPath).should.be.ok;
+    return env;
   }
 
   before(function () {
@@ -42,6 +44,7 @@ describe('dynamic bootstrap', function () {
   it('should generate dynamic bootstrap', function (done) {
     process.env.APPIUM_BOOTSTRAP_DIR = '/tmp/appium-uiauto/test/unit/bootstrap';
     rimraf(process.env.APPIUM_BOOTSTRAP_DIR)
+
       // first call: should create new bootstrap file
       .then(function () { return prepareBootstrap(); })
       .then(function (bootstrapFile) {
@@ -53,6 +56,7 @@ describe('dynamic bootstrap', function () {
         logger.debug.calledWithMatch(/Creating or overwritting dynamic bootstrap/).should.be.ok;
         logger.debug.reset();
       })
+
       // second call: should reuse bootstrap file
       .then(function () { return prepareBootstrap(); })
       .then(function (bootstrapFile) {
@@ -63,6 +67,7 @@ describe('dynamic bootstrap', function () {
         logger.debug.calledWithMatch(/Reusing dynamic bootstrap/).should.be.ok;
         logger.debug.reset();
       })
+
       // third call with extra imports: should create different bootstrap file
       .then(function () {
         var imports = {pre: ['dir1/alib.js'] };
@@ -77,6 +82,21 @@ describe('dynamic bootstrap', function () {
         logger.debug.calledWithMatch(/Creating or overwritting dynamic bootstrap/).should.be.ok;
         logger.debug.reset();
       })
+
+      // fourth call using custom socket path: should create different bootstrap file
+      .then(function () {
+        return prepareBootstrap({sock: '/tmp/abcd/sock'});
+      }).then(function (bootstrapFile) {
+        bootstrapFile.should.match(/\/tmp\/appium-uiauto\/test\/unit\/bootstrap\/bootstrap\-.*\.js/);
+        var code = fs.readFileSync(bootstrapFile, 'utf8');
+        var env = checkCode(code, {isVerbose: true, gracePeriod: 5});
+        env.instrumentsSock.should.equal('/tmp/abcd/sock');
+      })
+      .then(function () {
+        logger.debug.calledWithMatch(/Creating or overwritting dynamic bootstrap/).should.be.ok;
+        logger.debug.reset();
+      })
+
       .nodeify(done);
   });
 

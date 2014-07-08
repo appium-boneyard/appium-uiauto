@@ -6,6 +6,7 @@ var env;
   env.init = function (dynamicEnv) {
     this.nodePath = dynamicEnv.nodePath;
     this.commandProxyClientPath = dynamicEnv.commandProxyClientPath;
+    this.instrumentsSock = dynamicEnv.instrumentsSock;
   };
 
 })();

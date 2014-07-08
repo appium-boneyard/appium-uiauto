@@ -37,7 +37,8 @@ var prepareBootstrap = function (opts) {
       '<ROOT_DIR>': rootDir,
       '"<POST_IMPORTS>"': postImports.join('\n'),
       '<commandProxyClientPath>': env.commandProxyClientPath,
-      '<nodePath>': env.nodePath
+      '<nodePath>': env.nodePath,
+      '<instrumentsSock>': env.instrumentsSock
     }).each(function (value, key) {
       code = code.replace(new RegExp(key, 'g'), value);
     });
@@ -46,14 +47,15 @@ var prepareBootstrap = function (opts) {
       isVerbose: true
     });
   } else {
-    var bootstrapOpts = {};
+    opts = _.clone(opts);
     if (opts.chai) {
-      bootstrapOpts.imports = {};
-      bootstrapOpts.imports.pre =
+      opts.imports = {};
+      opts.imports.pre =
         [path.resolve(rootDir, 'node_modules/chai/chai.js')];
     }
+    delete opts.chai;
     return require('../../lib/dynamic-bootstrap')
-      .prepareBootstrap(bootstrapOpts);
+      .prepareBootstrap(opts);
   }
 };
 
@@ -65,9 +67,9 @@ var newInstruments = function (bootstrapFile) {
   });
 };
 
-var init = function (bootstrapFile) {
+var init = function (bootstrapFile, opts) {
   var deferred = Q.defer();
-  var proxy = new CommandProxy();
+  var proxy = new CommandProxy(opts);
   proxy.start(
     // first connection
     function () {
@@ -115,12 +117,12 @@ exports.globalInit = function (ctx, opts) {
   });
 };
 
-exports.instrumentsInstanceInit = function () {
+exports.instrumentsInstanceInit = function (opts) {
   var deferred = Q.defer();
 
   var ctx;
   before(function () {
-    return init(bootstrapFile)
+    return init(bootstrapFile, opts)
       .then(function (_ctx) {
         ctx = _ctx;
         ctx.sendCommand = function (cmd) {

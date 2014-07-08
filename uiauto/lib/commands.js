@@ -51,7 +51,7 @@ var commands;
 
   var sendResultAndGetNext = function (result) {
     curAppiumCmdId++;
-    var args = [env.commandProxyClientPath, '/tmp/instruments_sock'];
+    var args = [env.commandProxyClientPath, env.instrumentsSock];
     if (typeof result !== "undefined") {
       if (result.type === 'chunk') {
         // we responded to the 'more' command

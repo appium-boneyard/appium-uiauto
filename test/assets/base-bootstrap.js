@@ -16,5 +16,5 @@ chai.should();
 var env = {};
 env.commandProxyClientPath = "<commandProxyClientPath>";
 env.nodePath = "<nodePath>";
-
+env.instrumentsSock = "<instrumentsSock>";
 commands.startProcessing();
