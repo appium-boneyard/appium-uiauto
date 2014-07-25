@@ -55,8 +55,7 @@
     var type = this.type();
     if (type.match(/textfield$/i)) {
       var parent = this.parent();
-      res = parent &&  parent.type() === type &&
-        parent.name() === this.name();
+      res = parent && parent.type() === type;
     }
     return res;
   };
