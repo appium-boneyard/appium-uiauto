@@ -2,6 +2,49 @@
 
 (function () {
 
+  // return all elements of type contained in typeArray
+  UIAElement.prototype._elementOrElementsByType = function (typeArray, onlyFirst, onlyVisible) {
+    if (!typeArray) throw new Error("Must provide typeArray when calling _elementOrElementsByType");
+    var numTypes = typeArray.length;
+    onlyFirst = onlyFirst === true;
+    onlyVisible = onlyVisible !== false;
+
+    var target = $.target();
+    target.pushTimeout(0);
+
+    var getTree = function (element) {
+      var elems = [];
+      // process element
+      var visible = element.isVisible() === 1;
+      var elType = element.type();
+      for (var i = 0; i < numTypes; i++) {
+        if (elType === typeArray[i]) {
+          if (!onlyVisible || visible) {
+            elems.push(element);
+            if (onlyFirst && elems.length === 1) return elems;
+            break;
+          }
+        }
+      }
+
+      if (element.hasChildren()) {
+        var children = element.elements();
+        var numChildren = children.length;
+        for (var i = 0; i < numChildren; i++) {
+          if (onlyFirst && elems.length === 1) return elems;
+          elems = elems.concat(getTree(children[i]));
+        }
+      }
+
+      return elems;
+    };
+
+    var foundElements = getTree(this);
+    target.popTimeout();
+
+    return $.smartWrap(foundElements).dedup();
+  };
+
   UIAElement.prototype.getFirstWithPredicateWeighted = function (predicate) {
     var weighting = [
         'secureTextFields'
