@@ -14,7 +14,23 @@
       if (isAccented(newValue)) {
         this.setValue(newValue);
       } else {
-        $.sendKeysToActiveElement(newValue);
+        /*
+         * Sending large chunks of text, especially with capital letters,
+         * often muddles the input causing errors where keys are not
+         * found. Breaking into individual letters, while slower, fixes
+         * the problem.
+         */
+        for (i = 0; i < newValue.length; i++) {
+          var c = newValue.charAt(i);
+          try {
+            $.sendKeysToActiveElement(c);
+          } catch (e) {
+            // retry once
+            $.debug("Error typing '" + c + "': " + e);
+            $.debug("Retrying...");
+            $.sendKeysToActiveElement(c);
+          }
+        }
       }
     } else if (type === "UIAPickerWheel") {
       this.selectValue(newValue);
