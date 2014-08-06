@@ -30,7 +30,9 @@
   },
   "devDependencies": {
     "appium-instruments": "~1.2.0",
+    "underscore": "~1.6.0",
     "chai": "~1.9.1",
+    "sinon-chai": "~2.5.0",
     "chai-as-promised": "~4.1.1",
     "jscs": "~1.5.3",
     "jshint": "~2.5.1",
