@@ -20,7 +20,7 @@
          * found. Breaking into individual letters, while slower, fixes
          * the problem.
          */
-        for (i = 0; i < newValue.length; i++) {
+        for (var i = 0; i < newValue.length; i++) {
           var c = newValue.charAt(i);
           try {
             $.sendKeysToActiveElement(c);

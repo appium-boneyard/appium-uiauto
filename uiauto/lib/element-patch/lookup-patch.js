@@ -30,7 +30,7 @@
       if (element.hasChildren()) {
         var children = element.elements();
         var numChildren = children.length;
-        for (var i = 0; i < numChildren; i++) {
+        for (i = 0; i < numChildren; i++) {
           if (onlyFirst && elems.length === 1) return elems;
           elems = elems.concat(getTree(children[i]));
         }
