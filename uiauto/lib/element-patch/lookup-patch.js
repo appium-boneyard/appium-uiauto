@@ -2,15 +2,50 @@
 
 (function () {
 
-  // return all elements of type contained in typeArray
-  UIAElement.prototype._elementOrElementsByType = function (typeArray, onlyFirst, onlyVisible) {
+  UIAElement.prototype._elementOrElementsByType = function (opts) {
+    var typeArray   = opts.typeArray,
+        onlyFirst   = opts.onlyFirst,
+        onlyVisible = opts.onlyVisible,
+        nameObject  = opts.name,
+        labelObject = opts.label,
+        valueObject = opts.value;
+
     if (!typeArray) throw new Error("Must provide typeArray when calling _elementOrElementsByType");
+
     var numTypes = typeArray.length;
     onlyFirst = onlyFirst === true;
     onlyVisible = onlyVisible !== false;
 
+    var validateObject = function (objectName, object) {
+      if (object && (typeof object.substring   === "undefined" ||
+                     typeof object.target      === "undefined" ||
+                     typeof object.insensitive === "undefined")) {
+        throw new Error(objectName + " object must contain substring, target, and insensitive");
+      }
+    };
+
+    validateObject("name", nameObject);
+    validateObject("label", labelObject);
+    validateObject("value", valueObject);
+
     var target = $.target();
     target.pushTimeout(0);
+
+    var attributeMatch = function (elementProperty, attributeObject) {
+      if (!elementProperty || !attributeObject) return false;
+
+      var target = attributeObject.target;
+      if (!target) return false;
+      if (attributeObject.insensitive) {
+        elementProperty = elementProperty.toLowerCase();
+        target = target.toLowerCase();
+      }
+      if (attributeObject.substring) {
+        return elementProperty.indexOf(target) !== -1;
+      } else {
+        return elementProperty === target;
+      }
+    };
 
     var getTree = function (element) {
       var elems = [];
@@ -20,7 +55,15 @@
       for (var i = 0; i < numTypes; i++) {
         if (elType === typeArray[i]) {
           if (!onlyVisible || visible) {
-            elems.push(element);
+            // if an object isn't provided then it's a match.
+            var nameMatch  = nameObject  ? attributeMatch(element.name(),  nameObject)  : true;
+            var labelMatch = labelObject ? attributeMatch(element.label(), labelObject) : true;
+            var valueMatch = valueObject ? attributeMatch(element.value(), valueObject) : true;
+
+            if (nameMatch && labelMatch && valueMatch && element.checkIsValid()) {
+              elems.push(element);
+            }
+
             if (onlyFirst && elems.length === 1) return elems;
             break;
           }
