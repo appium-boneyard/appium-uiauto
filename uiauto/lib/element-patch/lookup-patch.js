@@ -145,10 +145,12 @@
     if (!onlyFirst || results.length === 0) {
       var child;
       for (var a = 0, len = this.elements().length; a < len; a++) {
-          child = this.elements()[a];
+        child = this.elements()[a];
+        if (!child.isNil()) {
           results = results.concat(child
                       ._elementOrElementsWithPredicateWeighted(predicate,
                         weighting, onlyFirst, onlyVisible));
+        }
       }
     }
 
