@@ -49,6 +49,10 @@
 
     var getTree = function (element) {
       var elems = [];
+      // element.elements() may return nil children.
+      if (element.isNil()) {
+        return elems;
+      }
       // process element
       var visible = element.isVisible() === 1;
       var elType = element.type();
