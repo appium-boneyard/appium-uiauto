@@ -1,4 +1,4 @@
-/* globals $ */
+/* globals $, env */
 
 (function () {
   UIAElement.prototype.setValueByType = function (newValue) {
@@ -29,6 +29,9 @@
             $.debug("Error typing '" + c + "': " + e);
             $.debug("Retrying...");
             $.sendKeysToActiveElement(c);
+          }
+          if (env.interKeyDelay) {
+            $.delay(env.interKeyDelay);
           }
         }
       }

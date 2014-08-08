@@ -7,6 +7,7 @@ var env;
     this.nodePath = dynamicEnv.nodePath;
     this.commandProxyClientPath = dynamicEnv.commandProxyClientPath;
     this.instrumentsSock = dynamicEnv.instrumentsSock;
+    this.interKeyDelay = dynamicEnv.interKeyDelay;
   };
 
 })();
