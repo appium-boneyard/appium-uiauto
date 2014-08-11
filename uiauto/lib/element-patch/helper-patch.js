@@ -6,7 +6,6 @@
 
     if (type === "UIATextField" || type === "UIASecureTextField" ||
         type === "UIATextView" || type === "UIASearchBar") {
-      // do the full-on clear,keyboard typing operation
       if (this.hasKeyboardFocus() === 0) {
         this.tap();
       }
