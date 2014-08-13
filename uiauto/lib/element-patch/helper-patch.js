@@ -86,12 +86,11 @@
   };
 
   UIAElement.prototype.text = function () {
-    var type = this.type();
-    if (type === "UIAButton") {
-      return this.label();
-    } else {
-      return this.value();
-    }
+    var label = this.label();
+    var value = this.value();
+    
+    if (label) return label;
+    return value;
   };
 
   UIAElement.prototype.matchesTagName = function (tagName) {
