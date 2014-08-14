@@ -163,20 +163,20 @@
     return results;
   };
 
- var _formatPredicate = function (targetName, contains) {
-   targetName = targetName || "";
+  var _formatPredicate = function (targetName, contains) {
+    targetName = targetName || "";
 
-   if (typeof targetName !== 'string') {
-     throw new Error("You must supply a string for an element predicate search.");
-   }
+    if (typeof targetName !== 'string') {
+      throw new Error("You must supply a string for an element predicate search.");
+    }
 
-   // escape unescaped single and double quotation marks and return a predicate condition
-   // string in the format 'name VERB "TARGET" || label VERB "TARGET"'.
-   var verb = contains ? 'contains[c]' : '==';
-   var comparison = verb + ' "' + targetName.replace(/\\?['"]/g, "\\$&") + '"';
+    // escape unescaped single and double quotation marks and return a predicate condition
+    // string in the format 'name VERB "TARGET" || label VERB "TARGET"'.
+    var verb = contains ? 'contains[c]' : '==';
+    var comparison = verb + ' "' + targetName.replace(/\\?['"]/g, "\\$&") + '"';
 
-   return 'name ' + comparison + ' || label ' + comparison;
-  }
+    return 'name ' + comparison + ' || label ' + comparison;
+  };
 
   UIAElement.prototype.getWithName = function (targetName, onlyVisible) {
     return this.getFirstWithPredicate(_formatPredicate(targetName, false), onlyVisible);
