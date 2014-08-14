@@ -163,20 +163,35 @@
     return results;
   };
 
+ var _formatPredicate = function (targetName, contains) {
+   targetName = targetName || "";
+
+   if (typeof targetName !== 'string') {
+     throw new Error("You must supply a string for an element predicate search.");
+   }
+
+   // escape unescaped single and double quotation marks and return a predicate condition
+   // string in the format 'name VERB "TARGET" || label VERB "TARGET"'.
+   var verb = contains ? 'contains[c]' : '==';
+   var comparison = verb + ' "' + targetName.replace(/\\?['"]/g, "\\$&") + '"';
+
+   return 'name ' + comparison + ' || label ' + comparison;
+  }
+
   UIAElement.prototype.getWithName = function (targetName, onlyVisible) {
-    return this.getFirstWithPredicate("name == '" + targetName + "' || label == '" + targetName + "'", onlyVisible);
+    return this.getFirstWithPredicate(_formatPredicate(targetName, false), onlyVisible);
   };
 
   UIAElement.prototype.getAllWithName = function (targetName, onlyVisible) {
-    return this.getAllWithPredicate("name == '" + targetName + "' || label == '" + targetName + "'", onlyVisible);
+    return this.getAllWithPredicate(_formatPredicate(targetName, false), onlyVisible);
   };
 
   UIAElement.prototype.getNameContains = function (targetName, onlyVisible) {
-    return this.getFirstWithPredicate("name contains[c] '" + targetName + "' || label contains[c] '" + targetName + "'", onlyVisible);
+    return this.getFirstWithPredicate(_formatPredicate(targetName, true), onlyVisible);
   };
 
   UIAElement.prototype.getAllNameContains = function (targetName, onlyVisible) {
-    return this.getAllWithPredicate("name contains[c] '" + targetName + "' || label contains[c] '" + targetName + "'", onlyVisible);
+    return this.getAllWithPredicate(_formatPredicate(targetName, true), onlyVisible);
   };
 
 })();
