@@ -88,7 +88,6 @@
   UIAElement.prototype.text = function () {
     var label = this.label();
     var value = this.value();
-    
     if (label) return label;
     return value;
   };
