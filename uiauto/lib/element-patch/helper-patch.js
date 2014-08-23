@@ -86,8 +86,12 @@
   };
 
   UIAElement.prototype.text = function () {
-    var label = this.label();
+    var type = this.type();
     var value = this.value();
+    if (type === "UIATextField") {
+      return value;
+    }
+    var label = this.label();
     if (label) return label;
     return value;
   };
