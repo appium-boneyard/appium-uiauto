@@ -81,7 +81,7 @@ var init = function (bootstrapFile, opts) {
       newInstruments(bootstrapFile).then(function (_instruments) {
         var instruments = _instruments;
         instruments.start(null, function () {
-          proxy.safeShutdown();
+          proxy.safeShutdown(function () {});
         });
         setTimeout(function () {
           instruments.launchHandler();
@@ -101,7 +101,7 @@ var killAll = function (ctx) {
       return instrumentsUtils.killAllInstruments();
     }).catch(function () {})
     .then(function () {
-      return ctx.proxy.safeShutdown();
+      return ctx.proxy.safeShutdown(function () {});
     });
 };
 
