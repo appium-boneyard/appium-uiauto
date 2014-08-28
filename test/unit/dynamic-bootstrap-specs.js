@@ -14,17 +14,15 @@ chai.use(sinonChai);
 
 describe('dynamic bootstrap', function () {
   function envFromCode(code) {
-    /* jshint unused:false */
-    var bootstrap = function (env) {
-      return env;
-    };
-    /* jshint evil:true */
-    return eval(code.replace(/#import.*/g, ''));
+    // let's pick out the dynamic env from the new bootrap file with this
+    // regex so we can be sure it matches what we expect
+    var envRe = /^bootstrap\((\{[^]+})\);$/m;
+    var envStr = envRe.exec(code)[1];
+    var env = JSON.parse(envStr);
+    return env;
   }
 
   function checkCode(code) {
-    code.should.match(/#import/);
-    /* jshint evil:true */
     var env = envFromCode(code);
     env.nodePath.should.equal(process.execPath);
     env.commandProxyClientPath.should.exist;
@@ -65,21 +63,6 @@ describe('dynamic bootstrap', function () {
         checkCode(code);
       }).then(function () {
         logger.debug.calledWithMatch(/Reusing dynamic bootstrap/).should.be.ok;
-        logger.debug.reset();
-      })
-
-      // third call with extra imports: should create different bootstrap file
-      .then(function () {
-        var imports = {pre: ['dir1/alib.js'] };
-        return prepareBootstrap({imports: imports});
-      }).then(function (bootstrapFile) {
-        bootstrapFile.should.match(/\/tmp\/appium-uiauto\/test\/unit\/bootstrap\/bootstrap\-.*\.js/);
-        var code = fs.readFileSync(bootstrapFile, 'utf8');
-        code.should.match(/#import "dir1\/alib.js";/);
-        checkCode(code, {isVerbose: true, gracePeriod: 5});
-      })
-      .then(function () {
-        logger.debug.calledWithMatch(/Creating or overwritting dynamic bootstrap/).should.be.ok;
         logger.debug.reset();
       })
 
