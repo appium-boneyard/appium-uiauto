@@ -78,13 +78,19 @@
         var method = 'scroll' + direction[0].toUpperCase() + direction.slice(1);
         el[method]();
       }.bind(this);
-      try {
-        var viewEl = this.getElementByType('scrollview');
-        return doScroll(viewEl);
-      } catch (err) {
-        viewEl = this.getElementByType('tableview');
-        return doScroll(viewEl);
+      var scrollTypes = ['scrollview', 'tableview', 'collection'];
+      var viewEl;
+      for (var i = 0; i < scrollTypes.length; i++) {
+        $.debug("Looking for view of type " + scrollTypes[i]);
+        viewEl = this.getElementByType(scrollTypes[i]);
+        if (viewEl) {
+          break;
+        }
       }
+      if (!viewEl || viewEl.isNil()) {
+        throw new Error("Couldn't find an initial view to scroll");
+      }
+      doScroll(viewEl);
     }
 
   , flickApp: function (startX, startY, endX, endY) {
