@@ -96,6 +96,7 @@
           return allUIA;
         });
         if (allUIA) return $(obj);
+        return obj;
       } else {
         throw new Error('smartWrap failed,');
       }

@@ -181,6 +181,11 @@ var commands;
           };
         } else {
           /* jshint evil:true */
+          if (cmd.indexOf("$.crash()") === 0) {
+            // if we get something that looks like '$.crash()', fail.
+            // this is for testing purposes
+            throw new Error("Crash!");
+          }
           try {
             $.debug('evaluating ' + cmd);
             var rawRes = eval(cmd);
