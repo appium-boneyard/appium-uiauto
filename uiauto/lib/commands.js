@@ -17,7 +17,7 @@ var commands;
 (function () {
   var BIG_DATA_THRESHOLD = 50000;
   var MORE_COMMAND = "#more";
-  var MESSAGE_TYPES = ['error','no data','regular','chunk','last chunk'];
+  var MESSAGE_TYPES = ['error', 'no data', 'regular', 'chunk', 'last chunk'];
 
   commands = {};
   var WAIT_FOR_DATA_TIMEOUT = 3600;
@@ -30,7 +30,7 @@ var commands;
       return this.idx > this.result.length;
     };
     this.messageType = function () {
-      return this.noMore()? MESSAGE_TYPES.indexOf('last chunk') :
+      return this.noMore() ? MESSAGE_TYPES.indexOf('last chunk') :
         MESSAGE_TYPES.indexOf('chunk');
     };
     this.nextChunk = function () {
@@ -59,7 +59,7 @@ var commands;
       } else {
         var stringResult = JSON.stringify(result);
         $.debug('responding with:' + stringResult.substring(300));
-        if (stringResult.length < BIG_DATA_THRESHOLD){
+        if (stringResult.length < BIG_DATA_THRESHOLD) {
           // regular small results
           args.push(MESSAGE_TYPES.indexOf('regular') + ',' + stringResult);
         } else {
@@ -69,7 +69,7 @@ var commands;
         }
       }
     } else {
-        args.push(MESSAGE_TYPES.indexOf('no data') + ',');
+      args.push(MESSAGE_TYPES.indexOf('no data') + ',');
     }
     var cmd = env.nodePath + " " + args.join(" ");
     var cmdLog = cmd.slice(0, 300) + '...';
@@ -91,7 +91,7 @@ var commands;
       $.debug(res.stdout);
       return null;
     }
-    var output = res.stdout.replace(/^(.*\n)*----- OUTPUT -----\r?\n/g,'');
+    var output = res.stdout.replace(/^(.*\n)*----- OUTPUT -----\r?\n/g, '');
     return JSON.parse(output).cmd;
   };
 
@@ -109,11 +109,11 @@ var commands;
     // - else --> return result as it is
 
     // converting UIAElementArray to mechanic wrap
-    if (rawRes instanceof UIAElementArray){
+    if (rawRes instanceof UIAElementArray) {
       rawRes = $.smartWrap(rawRes);
     }
     // converting array of UIAElement to mechanic wrap
-    if (Array.isArray(rawRes) && rawRes.length > 0){
+    if (Array.isArray(rawRes) && rawRes.length > 0) {
       try {
         rawRes = $.smartWrap(rawRes);
       } catch (ign) {
@@ -151,7 +151,7 @@ var commands;
     }
   }
 
-  function buildErrorResult (err) {
+  function buildErrorResult(err) {
     $.error('Error during eval: ' + err.stack);
     if (err.isAppium) {
       return {
@@ -200,6 +200,14 @@ var commands;
       } else {
         throw new Error("Error getting next command, shutting down :-(");
       }
+    }
+  };
+
+  commands.loopInfinitely = function () {
+    $.debug("No command proxy active; just looping infinitely");
+    while (true) {
+      $.debug("Waiting...");
+      $.system().performTaskWithPathArgumentsTimeout('/bin/sleep', [2]);
     }
   };
 })();
