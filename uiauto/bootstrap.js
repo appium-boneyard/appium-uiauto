@@ -14,7 +14,11 @@ var bootstrap;
 (function () {
   bootstrap = function (dynamicEnv) {
     env.init(dynamicEnv);
-    alerts.configure();
-    commands.startProcessing();
+    if (env.justLoopInfinitely) {
+      commands.loopInfinitely();
+    } else {
+      alerts.configure();
+      commands.startProcessing();
+    }
   };
 })();

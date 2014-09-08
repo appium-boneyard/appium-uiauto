@@ -8,6 +8,7 @@ var env;
     this.commandProxyClientPath = dynamicEnv.commandProxyClientPath;
     this.instrumentsSock = dynamicEnv.instrumentsSock;
     this.interKeyDelay = dynamicEnv.interKeyDelay;
+    this.justLoopInfinitely = dynamicEnv.justLoopInfinitely;
   };
 
 })();
