@@ -126,8 +126,9 @@
 
     var results = [];
     var element = this;
-    var found;
-    $.each(weighting, function (idx, prop) {
+    var found, prop;
+    for (var i = 0; i < weighting.length; i++) {
+      prop = weighting[i];
       if (typeof element[prop] === 'function') {
         found = element[prop]();
         if (predicate) found = found.withPredicate(predicate);
@@ -142,8 +143,8 @@
 
       // If we don't find anything or if we aren't just trying to find the first
       // match, keep looking. Otherwise exit the loop.
-      return (!onlyFirst || results.length === 0);
-    });
+      if (onlyFirst || results.length > 0) break;
+    }
 
     // Only look through children if we have to.
     if (!onlyFirst || results.length === 0) {
