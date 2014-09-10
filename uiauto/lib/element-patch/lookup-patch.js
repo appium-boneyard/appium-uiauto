@@ -149,9 +149,13 @@
     // Only look through children if we have to.
     if (!onlyFirst || results.length === 0) {
       var child;
-      for (var a = 0, len = this.elements().length; a < len; a++) {
-        child = this.elements()[a];
-        if (!child.isNil()) {
+      var children = this.elements();
+      for (var a = 0; a < children.length; a++) {
+        child = children[a];
+        // make sure child isn't nil and isn't a webview
+        // (we don't care about them for native and they tend to have tons
+        // of children which make performance bad)
+        if (!child.isNil() && child.type() !== "UIAWebView") {
           results = results.concat(child
                       ._elementOrElementsWithPredicateWeighted(predicate,
                         weighting, onlyFirst, onlyVisible));
