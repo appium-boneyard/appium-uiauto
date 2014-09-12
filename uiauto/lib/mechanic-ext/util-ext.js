@@ -5,14 +5,18 @@
     cache: []
   , identifier: 0
   , _defaultContext: function (ctx) {
-    if (typeof ctx === 'string') {
-      return this.cache[ctx];
-    } else if (typeof ctx !== 'undefined') {
-      return ctx;
-    } else {
-      return $.mainApp();
+      if (typeof ctx === 'string') {
+        var el = this.cache[ctx];
+        if (el.isNil()) {
+          throw new STATUS.StaleElementReference("Context element was nil");
+        }
+        return el;
+      } else if (typeof ctx !== 'undefined') {
+        return ctx;
+      } else {
+        return $.mainApp();
+      }
     }
-  }
 
   , convertSelector: function (selector) {
       // some legacy: be backwards compatible, mechanic.js

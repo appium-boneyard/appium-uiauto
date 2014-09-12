@@ -94,10 +94,10 @@
 
   UIAElement.prototype.getFirstWithPredicateWeighted = function (predicate) {
     var weighting = [
-        'secureTextFields'
-      , 'textFields'
-      , 'buttons'
-      , 'elements'
+      'secureTextFields'
+    , 'textFields'
+    , 'buttons'
+    , 'elements'
     ];
     var elems = this._elementOrElementsWithPredicateWeighted(predicate,
                   weighting, true);
@@ -143,7 +143,7 @@
 
       // If we don't find anything or if we aren't just trying to find the first
       // match, keep looking. Otherwise exit the loop.
-      if (onlyFirst || results.length > 0) break;
+      if (onlyFirst && results.length > 0) break;
     }
 
     // Only look through children if we have to.
