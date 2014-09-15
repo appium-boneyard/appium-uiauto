@@ -262,9 +262,6 @@
         }
       }
       if (ret === null) {
-        $.each(elems,function (i, elem) {
-          $(elem).log();
-        });
         ret = $.smartWrap(elems).dedup();
       }
       $.target().popTimeout();
