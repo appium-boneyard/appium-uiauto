@@ -1,4 +1,4 @@
-/* global autoAcceptAlerts, $ */
+/* global $, env */
 
 var alerts;
 
@@ -8,7 +8,7 @@ var alerts;
     UIATarget.onAlert = function (alert) {
       if (alert.name() && alert.name().indexOf("attempting to open a pop-up") !== -1 && alert.buttons().length > 0) {
         $.acceptAlert();
-      } else if (autoAcceptAlerts && alert.buttons().length > 0) {
+      } else if (env.autoAcceptAlerts && alert.buttons().length > 0) {
         $.acceptAlert();
       }
       return true;
