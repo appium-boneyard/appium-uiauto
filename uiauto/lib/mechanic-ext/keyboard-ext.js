@@ -46,34 +46,58 @@
       }
     }
 
-  , hideKeyboard: function (strategy, keyName) {
-      var tapOutside = function () {
-        $($.mainWindow()).tap();
-        $.delay(1000);
-      };
+    , _tryWaitKbHidden: function() {
+      var interval = 50, t = 0;
+
+      while(t < 3000 && !$.mainApp().keyboard().isNil()) {
+        t += interval;
+        $.delay(interval);
+      }
+
+      return $.mainApp().keyboard().isNil();
+    }
+
+    , _pressKeyToHideKeyboard: function (keyName) {
+      $.debug("Hiding keyboard with keyName " + keyName);
+      var key = this.keyboard().buttons()[keyName];
+
+      if (key.isValid()) {
+        key.tap();
+      } else {
+        throw new Error("Invalid key name.")
+      }
+    }
+
+    , _swipeToHideKeyboard: function () {
+      $.debug("Hiding keyboard using swipe keyboard");
+      var startY = $.mainApp().keyboard().rect().origin.y - 10;
+      var endY = $.mainWindow().rect().size.height - 10;
+      $.flickApp(0, startY, 0, endY);
+    }
+
+    , hideKeyboard: function (strategy, keyName) {
+      if($.mainApp().keyboard().isNil()) {
+        return;
+      }
+
       switch (strategy) {
         case 'press':
         case 'pressKey':
-          $.debug("Hiding keyboard by pressing the key: " + keyName);
-          try {
-            var keys = $.keyboard().buttons();
-            keys[keyName].tap();
-          } catch (e) {
-            throw new ERROR.NoSuchElement(
-              "Could not find the '" + keyName + "' key.");
-          }
-          $.delay(1000);
+          $._pressKeyToHideKeyboard(keyName);
           break;
+        case 'swipe':
         case 'tapOut':
         case 'tapOutside':
-          tapOutside();
-          break;
         case 'default':
-          tapOutside();
+          $._swipeToHideKeyboard();
           break;
         default:
           throw new Error('Unknown strategy: ' + strategy);
       }
+
+      if(!$._tryWaitKbHidden()) {
+        throw new Error("Failed to hide keyboard.");
+      }
     }
-  });
+});
 })();
