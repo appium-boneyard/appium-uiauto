@@ -68,7 +68,7 @@
       }
     }
 
-    , _swipeToHideKeyboard: function () {
+    , _swipeDownToHideKeyboard: function () {
       $.debug("Hiding keyboard using swipe keyboard");
       var startY = $.mainApp().keyboard().rect().origin.y - 10;
       var endY = $.mainWindow().rect().size.height - 10;
@@ -85,11 +85,13 @@
         case 'pressKey':
           $._pressKeyToHideKeyboard(keyName);
           break;
-        case 'swipe':
+        case 'swipeDown':
+          $._swipeDownToHideKeyboard();
+          break;
         case 'tapOut':
         case 'tapOutside':
         case 'default':
-          $._swipeToHideKeyboard();
+          $($.mainWindow()).tap();
           break;
         default:
           throw new Error('Unknown strategy: ' + strategy);
