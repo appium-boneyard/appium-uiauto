@@ -46,17 +46,6 @@
       }
     }
 
-    , _tryWaitKbHidden: function() {
-      var interval = 50, t = 0;
-
-      while(t < 3000 && !$.mainApp().keyboard().isNil()) {
-        t += interval;
-        $.delay(interval);
-      }
-
-      return $.mainApp().keyboard().isNil();
-    }
-
     , _pressKeyToHideKeyboard: function (keyName) {
       $.debug("Hiding keyboard with keyName " + keyName);
       var key = this.keyboard().buttons()[keyName];
@@ -97,7 +86,7 @@
           throw new Error('Unknown strategy: ' + strategy);
       }
 
-      if(!$._tryWaitKbHidden()) {
+      if(!$.tryWaitForCondition(function(){ return $.mainApp().keyboard().isNil(); })) {
         throw new Error("Failed to hide keyboard.");
       }
     }
