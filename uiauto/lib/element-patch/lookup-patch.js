@@ -60,11 +60,14 @@
         if (elType === typeArray[i]) {
           if (!onlyVisible || visible) {
             // if an object isn't provided then it's a match.
-            var nameMatch  = nameObject  ? attributeMatch(element.name(),  nameObject)  : true;
-            var labelMatch = labelObject ? attributeMatch(element.label(), labelObject) : true;
-            var valueMatch = valueObject ? attributeMatch(element.value(), valueObject) : true;
+            var nameMatch  = nameObject  ? attributeMatch(element.name(),  nameObject)  : false;
+            var labelMatch = labelObject ? attributeMatch(element.label(), labelObject) : false;
+            var valueMatch = valueObject ? attributeMatch(element.value(), valueObject) : false;
 
-            if (nameMatch && labelMatch && valueMatch && element.checkIsValid()) {
+            // If we're only searching for a type then skip attribute matching.
+            if (!nameObject && !labelObject && !valueObject) nameMatch = true;
+
+            if (element.checkIsValid() && (nameMatch || labelMatch || valueMatch)) {
               elems.push(element);
             }
 
