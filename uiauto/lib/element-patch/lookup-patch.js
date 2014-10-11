@@ -13,6 +13,11 @@
     if (!typeArray) throw new Error("Must provide typeArray when calling _elementOrElementsByType");
 
     var numTypes = typeArray.length;
+
+    // allow '*' to match on all types.
+    var allTypes = false;
+    if (numTypes === 1 && typeArray[0] === '*') allTypes = true;
+
     onlyFirst = onlyFirst === true;
     onlyVisible = onlyVisible !== false;
 
@@ -57,7 +62,7 @@
       var visible = element.isVisible() === 1;
       var elType = element.type();
       for (var i = 0; i < numTypes; i++) {
-        if (elType === typeArray[i]) {
+        if (allTypes || elType === typeArray[i]) {
           if (!onlyVisible || visible) {
             // if an object isn't provided then it's a match.
             var nameMatch  = nameObject  ? attributeMatch(element.name(),  nameObject)  : false;
