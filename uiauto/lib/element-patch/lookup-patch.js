@@ -13,6 +13,11 @@
     if (!typeArray) throw new Error("Must provide typeArray when calling _elementOrElementsByType");
 
     var numTypes = typeArray.length;
+
+    // allow '*' to match on all types.
+    var allTypes = false;
+    if (numTypes === 1 && typeArray[0] === '*') allTypes = true;
+
     onlyFirst = onlyFirst === true;
     onlyVisible = onlyVisible !== false;
 
@@ -57,14 +62,17 @@
       var visible = element.isVisible() === 1;
       var elType = element.type();
       for (var i = 0; i < numTypes; i++) {
-        if (elType === typeArray[i]) {
+        if (allTypes || elType === typeArray[i]) {
           if (!onlyVisible || visible) {
             // if an object isn't provided then it's a match.
-            var nameMatch  = nameObject  ? attributeMatch(element.name(),  nameObject)  : true;
-            var labelMatch = labelObject ? attributeMatch(element.label(), labelObject) : true;
-            var valueMatch = valueObject ? attributeMatch(element.value(), valueObject) : true;
+            var nameMatch  = nameObject  ? attributeMatch(element.name(),  nameObject)  : false;
+            var labelMatch = labelObject ? attributeMatch(element.label(), labelObject) : false;
+            var valueMatch = valueObject ? attributeMatch(element.value(), valueObject) : false;
 
-            if (nameMatch && labelMatch && valueMatch && element.checkIsValid()) {
+            // If we're only searching for a type then skip attribute matching.
+            if (!nameObject && !labelObject && !valueObject) nameMatch = true;
+
+            if (element.checkIsValid() && (nameMatch || labelMatch || valueMatch)) {
               elems.push(element);
             }
 
