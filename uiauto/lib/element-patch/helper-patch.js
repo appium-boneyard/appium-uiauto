@@ -9,6 +9,12 @@
       if (this.hasKeyboardFocus() === 0) {
         this.tap();
       }
+      // xcode6.0.1/ios71 is sometimes flaky and does not register the
+      // first tap, so retapping
+      if (this.hasKeyboardFocus() === 0) {
+        $.delay(100);
+        this.tap();
+      }
       if (isAccented(newValue)) {
         this.setValue(newValue);
       } else {
