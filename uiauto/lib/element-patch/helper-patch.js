@@ -15,8 +15,10 @@
         $.delay(100);
         this.tap();
       }
-      if (isAccented(newValue)) {
+      if (env.sendKeyStrategy === 'setValue' || isAccented(newValue)) {
         this.setValue(newValue);
+      } else if (env.sendKeyStrategy === 'grouped') {
+        $.sendKeysToActiveElement(newValue);
       } else {
         /*
          * Sending large chunks of text, especially with capital letters,

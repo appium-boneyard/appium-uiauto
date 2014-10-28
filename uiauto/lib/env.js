@@ -10,6 +10,7 @@ var env;
     this.interKeyDelay = dynamicEnv.interKeyDelay;
     this.justLoopInfinitely = dynamicEnv.justLoopInfinitely;
     this.autoAcceptAlerts = dynamicEnv.autoAcceptAlerts;
+    this.sendKeyStrategy = dynamicEnv.sendKeyStrategy;
   };
 
 })();
