@@ -12,13 +12,11 @@
 
 "use strict";
 
-var output;
+var output = '';
 
 function exit(status) {
-  if (output){
-    console.log('----- OUTPUT -----');
-    console.log(output);
-  }
+  console.log('----- OUTPUT -----');
+  console.log(output);
   // chill out before exiting
   process.nextTick(function () {
     process.exit(status);
@@ -46,7 +44,12 @@ d.run(function () {
     client.setEncoding('utf8');
     client.on('data', function (dataFromCommandProxy) {
       console.log("Data from command proxy to instruments: " + dataFromCommandProxy);
-      output = dataFromCommandProxy;
+      output += dataFromCommandProxy;
+    });
+    client.on('error', function (err) {
+      console.log("Error from command proxy to instruments: " + err);
+    });
+    client.on('end', function () {
       client.end();
       exit(0);
     });
