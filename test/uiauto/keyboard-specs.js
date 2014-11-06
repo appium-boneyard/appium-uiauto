@@ -8,6 +8,7 @@ describe('keyboard', function () {
   var imports = { post: [
     'uiauto/lib/mechanic-ext/gesture-ext.js',
     'uiauto/lib/mechanic-ext/keyboard-ext.js',
+    'uiauto/lib/element-patch/nil-patch.js'
   ]};
   base.globalInit(this, { imports: imports, bootstrap: 'basic'});
 
