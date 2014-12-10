@@ -4,17 +4,23 @@
   UIAElement.prototype.setValueByType = function (newValue) {
     var type = this.type();
 
-    if (type === "UIATextField" || type === "UIASecureTextField" ||
-        type === "UIATextView" || type === "UIASearchBar") {
-      if (this.hasKeyboardFocus() === 0) {
+    var ensureKeyboardOn = function (el) {
+      if (this.hasKeyboardFocus() === 0 || $.keyboard().isVisible() === 0) {
+        $.debug('No keyboard found. Tapping to make visible.');
         this.tap();
       }
-      // xcode6.0.1/ios71 is sometimes flaky and does not register the
-      // first tap, so retapping
-      if (this.hasKeyboardFocus() === 0) {
+      // some systems (particularly iOS 7.x sims from Xcode 6.x) are flakey
+      // and does not register the first tap, so retapping
+      if (this.hasKeyboardFocus() === 0 || $.keyboard().isVisible() === 0) {
+        $.debug('Still no keyboard found. Tapping again to make visible.');
         $.delay(100);
         this.tap();
       }
+    }.bind(this);
+
+    if (type === "UIATextField" || type === "UIASecureTextField" ||
+        type === "UIATextView" || type === "UIASearchBar") {
+      ensureKeyboardOn();
       if (env.sendKeyStrategy === 'setValue' || isAccented(newValue)) {
         this.setValue(newValue);
       } else if (env.sendKeyStrategy === 'grouped') {
@@ -31,7 +37,8 @@
           try {
             $.sendKeysToActiveElement(c);
           } catch (e) {
-            // retry once
+            // retry once, but first make sure the keyboard is up and running
+            ensureKeyboardOn();
             $.debug("Error typing '" + c + "': " + e);
             $.debug("Retrying...");
             $.sendKeysToActiveElement(c);
