@@ -29,7 +29,7 @@
 
     // handles some of the special keys in org.openqa.selenium.Keys
   , isSpecialKey: function (k) {
-      if (k === '\uE003') // DELETE
+      if (k === '\uE003' || k === '\ue017') // BACKSPACE or DELETE
         return true;
       else if (k === '\uE006' || k === '\uE007') // RETURN ENTER
         return true;
@@ -37,7 +37,7 @@
     }
 
   , typeKey: function (k) {
-      if (k === '\uE003') { // DELETE
+      if (k === '\uE003' || k === '\ue017') { // BACKSPACE or DELETE
         $.keyboard().keys().Delete.tap();
       } else if (k === '\uE006' || k === '\uE007') {// RETURN ENTER
         $.keyboard().typeString("\n");
