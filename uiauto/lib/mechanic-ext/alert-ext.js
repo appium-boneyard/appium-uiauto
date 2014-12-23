@@ -74,7 +74,7 @@
       if (!alert.isNil() && !alert.cancelButton().isNil()) {
         alert.cancelButton().tap();
         this.waitForAlertToClose(alert);
-      } else if (alert.isNil() && alert.buttons().length > 0) {
+      } else if (!alert.isNil() && alert.buttons().length > 0) {
         alert.buttons()[0].tap(); // first button is dismiss
         this.waitForAlertToClose(alert);
       } else {
