@@ -14,7 +14,8 @@ describe('grace period', function () {
     base.instrumentsInstanceInit()
       .then(function (_ctx) { ctx = _ctx; }).done();
 
-    it('should be quick when grace period is not set', function () {
+    // skipping, reenable when iwd is working again
+    it.skip('should be quick when grace period is not set', function () {
       var refMs = Date.now();
       return ctx.execFunc(
         function () {
@@ -24,7 +25,8 @@ describe('grace period', function () {
       .then(function () { (Date.now() - refMs).should.be.below(1000); });
     });
 
-    it('should be quick when pushing and poping 0 timeout', function () {
+    // skipping, reenable when iwd is working again
+    it.skip('should be quick when pushing and poping 0 timeout', function () {
       var refMs = Date.now();
       return ctx.execFunc(
         function () {
