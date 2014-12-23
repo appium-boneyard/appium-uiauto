@@ -29,14 +29,14 @@
     "winston": "~0.8.3"
   },
   "devDependencies": {
-    "appium-instruments": "~1.5.0",
+    "appium-instruments": "1.5.3",
     "underscore": "~1.7.0",
     "chai": "~1.10.0",
     "sinon-chai": "~2.6.0",
     "chai-as-promised": "~4.1.1",
     "jscs": "~1.8.1",
     "jshint": "~2.5.1",
-    "mocha": "~2.0.1",
+    "mocha": "~2.1.0",
     "rimraf": "~2.2.8",
     "sinon": "~1.12.2",
     "through": "~2.3.4"
