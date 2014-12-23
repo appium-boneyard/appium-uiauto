@@ -1,11 +1,16 @@
 /* globals $, ERROR */
 
 (function () {
-  $.extend($, {
+  var getAlert = function () {
+    var alert = $.mainApp().alert();
+    if (alert.isNil()) alert = $('alert')[0] || alert;
+    return alert;
+  }
 
+  $.extend($, {
     // Alert-related functions
     getAlertText: function () {
-      var alert = $.mainApp().alert();
+      var alert = getAlert();
       if (alert.isNil()) {
         throw new ERROR.NoAlertOpenError();
       }
@@ -29,7 +34,7 @@
     }
 
   , setAlertText: function (text) {
-      var alert = $.mainApp().alert();
+      var alert = getAlert();
       var el = this.getElementByType('textfield', alert);
       if (el) {
         el.setValueByType(text);
@@ -40,7 +45,7 @@
     }
 
   , acceptAlert: function () {
-      var alert = $.mainApp().alert();
+      var alert = $('alert')[0];
       if (!alert.isNil()) {
         var acceptButton = alert.defaultButton();
         var buttonCount = alert.buttons().length;
@@ -61,15 +66,15 @@
     }
 
   , alertIsPresent: function () {
-      return !$.mainApp().alert().isNil();
+      return !getAlert().isNil();
     }
 
   , dismissAlert: function () {
-      var alert = $.mainApp().alert();
+      var alert = getAlert();
       if (!alert.isNil() && !alert.cancelButton().isNil()) {
         alert.cancelButton().tap();
         this.waitForAlertToClose(alert);
-      } else if (!alert.isNil() && alert.buttons().length > 0) {
+      } else if (alert.isNil() && alert.buttons().length > 0) {
         alert.buttons()[0].tap(); // first button is dismiss
         this.waitForAlertToClose(alert);
       } else {
@@ -96,7 +101,7 @@
         } else {
           $.debug("Waiting for alert to close...");
           this.delay(300);
-          alert = $.mainApp().alert();
+          alert = getAlert();
         }
       }
     }
