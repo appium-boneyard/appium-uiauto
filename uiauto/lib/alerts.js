@@ -10,6 +10,8 @@ var alerts;
         $.acceptAlert();
       } else if (env.autoAcceptAlerts && alert.buttons().length > 0) {
         $.acceptAlert();
+      } else if (env.autoDismissAlerts && alert.buttons().length > 0) {
+        $.dismissAlert();
       }
       return true;
     };
