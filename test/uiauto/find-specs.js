@@ -25,12 +25,13 @@ describe('find', function () {
         function () {
           rootPage.clickMenuItem('Text Fields');
           $.delay(2000);
-          var cell = $($('#Empty list').children('cell')).first()[0];
+          var cell = $('cell')[0];
           var id = '' + $.getId(cell);
           var res = $.getElementsByType('UIATextField', id);
           return res;
         }
       ).then(function (res) {
+        console.warn('res -->', res);
         res.should.have.length(1);
       });
     });
@@ -40,7 +41,7 @@ describe('find', function () {
         function () {
           rootPage.clickMenuItem('Text Fields');
           $.delay(2000);
-          var cell = $('#Empty list').children('cell')[2];
+          var cell = $('cell')[2];
           var id = '' + $.getId(cell);
           var res = $.getElementsByType('UIASecureTextField', id);
           return res;
