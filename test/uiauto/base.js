@@ -63,7 +63,8 @@ var newInstruments = function (bootstrapFile) {
   return instrumentsUtils.quickInstrument({
     app: path.resolve(__dirname, '../assets/UICatalog.app'),
     bootstrap: bootstrapFile,
-    logger: logger.instance()
+    logger: logger.instance(),
+    simulatorSdkAndDevice: 'iPhone 6 (8.1 Simulator)'
   });
 };
 
