@@ -45,7 +45,7 @@
     }
 
   , acceptAlert: function () {
-      var alert = $('alert')[0];
+      var alert = getAlert();
       if (!alert.isNil()) {
         var acceptButton = alert.defaultButton();
         var buttonCount = alert.buttons().length;
