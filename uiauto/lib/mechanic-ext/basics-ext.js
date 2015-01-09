@@ -18,7 +18,7 @@
     , mainApp: function () {
       var app = null;
 
-      if (!$.tryWaitForCondition(function() {
+      if (!$.tryWaitForCondition(function () {
         app = $.target().frontMostApp();
         return app && app.isValid(); })) {
         throw new Error("No valid frontmost app was found.");
@@ -30,12 +30,12 @@
     , keyboard: function () {
       var appKeyboard = null;
 
-      if (!$.tryWaitForCondition(function() {
+      if (!$.tryWaitForCondition(function () {
         appKeyboard = $.mainApp().keyboard();
         return appKeyboard && appKeyboard.isValid(); })) {
         throw new Error("Could not locate keyboard.");
       }
-      
+
       return appKeyboard;
     }
 
@@ -48,9 +48,9 @@
 
     , debug: function (s) { if ($.isVerbose) UIALogger.logDebug(s); }
 
-    , tryWaitForCondition: function(condition, interval) {
+    , tryWaitForCondition: function (condition, interval) {
       if (typeof condition !== 'function') {
-        throw new Error("Must provide a callback returning a boolean.")
+        throw new Error("Must provide a callback returning a boolean.");
       }
 
       var i = interval || 20, t = 0;

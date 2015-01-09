@@ -1,4 +1,4 @@
-/* globals $, ERROR */
+/* globals $ */
 
 (function () {
   $.extend($, {
@@ -53,7 +53,7 @@
       if (key.isValid()) {
         key.tap();
       } else {
-        throw new Error("Invalid key name.")
+        throw new Error("Invalid key name.");
       }
     }
 
@@ -65,7 +65,7 @@
     }
 
     , hideKeyboard: function (strategy, keyName) {
-      if($.mainApp().keyboard().isNil()) {
+      if ($.mainApp().keyboard().isNil()) {
         return;
       }
 
@@ -86,7 +86,7 @@
           throw new Error('Unknown strategy: ' + strategy);
       }
 
-      if(!$.tryWaitForCondition(function(){ return $.mainApp().keyboard().isNil(); })) {
+      if (!$.tryWaitForCondition(function () { return $.mainApp().keyboard().isNil(); })) {
         throw new Error("Failed to hide keyboard.");
       }
     }

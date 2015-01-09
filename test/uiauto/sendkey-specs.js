@@ -1,4 +1,4 @@
-/* globals $ */
+/* globals $, env */
 'use strict';
 
 var base = require('./base'),
@@ -25,7 +25,7 @@ describe('sendKey', function () {
     );
   });
 
-  _([undefined,'oneByOne', 'grouped', 'setValue']).each(function(sendKeyStrategy) {
+  _([undefined,'oneByOne', 'grouped', 'setValue']).each(function (sendKeyStrategy) {
     it('should work with strategy: ' + sendKeyStrategy, function () {
       return ctx.execFunc(
         function (sendKeyStrategy) {

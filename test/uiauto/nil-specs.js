@@ -1,4 +1,4 @@
-/* globals $, rootPage */
+/* globals $ */
 'use strict';
 
 var base = require('./base');
