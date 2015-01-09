@@ -2,6 +2,11 @@
 
 (function () {
   var delaySec = $.delay;
+  var nil = new UIAElementNil();
+
+  // prototyping does not work when creating UIAElementNil
+  nil.isNil = function () { return true; };
+
   $.extend($, {
 
     system: function () { return $.target().host(); }
@@ -58,6 +63,6 @@
       }
 
       return isMet;
-    }
+    }, nil: nil
   });
 })();
