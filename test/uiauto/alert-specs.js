@@ -9,6 +9,7 @@ describe('alarm', function () {
     'uiauto/lib/status.js',
     'uiauto/lib/element-patch/nil-patch.js',
     'uiauto/lib/element-patch/helper-patch.js',
+    'uiauto/lib/mechanic-ext/basics-ext.js',
     'uiauto/lib/mechanic-ext/util-ext.js',
     'uiauto/lib/mechanic-ext/lookup-ext.js',
     'uiauto/lib/mechanic-ext/alert-ext.js'
