@@ -3,9 +3,13 @@
 (function () {
   var getAlert = function () {
     var alert = $.mainApp().alert();
-    if (alert.isNil()) alert = $('alert')[0] || alert;
-    return alert;
-  }
+    if (alert.isValid()) return alert;
+    alert = null;
+    $('alert').forEach(function (_alert) {
+      if (!alert && _alert.isValid()) alert = _alert;
+    });
+    return alert || $.nil;
+  };
 
   $.extend($, {
     // Alert-related functions

@@ -4,7 +4,7 @@
   UIAElement.prototype.setValueByType = function (newValue) {
     var type = this.type();
 
-    var ensureKeyboardOn = function (el) {
+    var ensureKeyboardOn = function () {
       if (this.hasKeyboardFocus() === 0 || $.keyboard().isVisible() === 0) {
         $.debug('No keyboard found. Tapping to make visible.');
         this.tap();

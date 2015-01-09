@@ -13,6 +13,7 @@ test_unit:
 	./node_modules/.bin/mocha test/unit
 
 test_uiauto:
+	pkill -f Simulator
 	./node_modules/.bin/mocha test/uiauto
 	make clean_trace
 
