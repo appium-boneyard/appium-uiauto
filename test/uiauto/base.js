@@ -64,30 +64,30 @@ var newInstruments = function (bootstrapFile) {
     app: path.resolve(__dirname, '../assets/UICatalog.app'),
     bootstrap: bootstrapFile,
     logger: logger.instance(),
-    simulatorSdkAndDevice: 'iPhone 6 (8.1 Simulator)'
+    simulatorSdkAndDevice: 'iPhone 6 (8.1 Simulator)',
+    launchTries: 2
   });
 };
 
 var init = function (bootstrapFile, opts) {
   var deferred = Q.defer();
   var proxy = new CommandProxy(opts);
+  var instruments;
   proxy.start(
     // first connection
-    function () {
-      // TODO
+    function (err) {
+      instruments.launchHandler(err);
+      if (err) return deferred.reject(err);
+      deferred.resolve({proxy: proxy, instruments: instruments});
     },
     // regular cb
     function (err) {
       if (err) return deferred.reject(err);
       newInstruments(bootstrapFile).then(function (_instruments) {
-        var instruments = _instruments;
+        instruments = _instruments;
         instruments.start(null, function () {
           proxy.safeShutdown(function () {});
         });
-        setTimeout(function () {
-          instruments.launchHandler();
-          deferred.resolve({proxy: proxy, instruments: instruments});
-        }, 2000);
       })
       .catch(function (err) { deferred.reject(err); })
       .done();
