@@ -2,6 +2,14 @@
 
 (function () {
 
+  $._elementOrElementsByType = function (targetElement, opts) {
+     if (!targetElement || targetElement.isNil()) {
+      throw new Error("Target element must exist");
+    }
+
+    return targetElement._elementOrElementsByType(opts);
+  };
+
   UIAElement.prototype._elementOrElementsByType = function (opts) {
     var typeArray   = opts.typeArray,
         onlyFirst   = opts.onlyFirst,
