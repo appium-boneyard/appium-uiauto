@@ -215,10 +215,4 @@
     return this.getAllWithPredicate(_formatPredicate(targetName, true), onlyVisible);
   };
 
-  UIAElement.prototype.getWithNameAndTap = function (targetName, onlyVisible) {
-    el = this.getWithName(targetName, onlyVisible);
-    el.tap();
-    return el;
-  };
-
 })();
