@@ -8,17 +8,17 @@
       var orientation = $.orientation()
         , value = null;
       switch (orientation) {
-        case UIA_DEVICE_ORIENTATION_UNKNOWN ||
-             UIA_DEVICE_ORIENTATION_FACEUP ||
-             UIA_DEVICE_ORIENTATION_FACEDOWN:
+        case UIA_DEVICE_ORIENTATION_UNKNOWN:
+        case UIA_DEVICE_ORIENTATION_FACEUP:
+        case UIA_DEVICE_ORIENTATION_FACEDOWN:
           value = "UNKNOWN";
           break;
-        case UIA_DEVICE_ORIENTATION_PORTRAIT ||
-             UIA_DEVICE_ORIENTATION_PORTRAIT_UPSIDEDOWN:
+        case UIA_DEVICE_ORIENTATION_PORTRAIT:
+        case UIA_DEVICE_ORIENTATION_PORTRAIT_UPSIDEDOWN:
           value = "PORTRAIT";
           break;
-        case UIA_DEVICE_ORIENTATION_LANDSCAPELEFT ||
-             UIA_DEVICE_ORIENTATION_LANDSCAPERIGHT:
+        case UIA_DEVICE_ORIENTATION_LANDSCAPELEFT:
+        case UIA_DEVICE_ORIENTATION_LANDSCAPERIGHT:
           value = "LANDSCAPE";
           break;
       }
