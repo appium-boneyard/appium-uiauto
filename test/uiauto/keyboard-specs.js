@@ -36,7 +36,6 @@ describe('keyboard', async () => {
 
     _.each(['pressKey', 'press'], function (strategy) {
       it(`should hide the keyboard by pressing the done key (${strategy})`, async () => {
-        // TODO: need to assert something here
         await ctx.execFunc(
           function (strategy) {
             rootPage.clickMenuItem('Text Fields');

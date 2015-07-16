@@ -4,9 +4,9 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Promise from 'bluebird';
-import CommandProxy from '../../lib/command-proxy';
-import instrumentsLib from 'appium-instruments';
-import bootstrapLib from '../../lib/dynamic-bootstrap';
+import { UIAutoClient, prepareBootstrap } from '../..';
+import Instruments from 'appium-instruments';
+import { getEnv } from '../../lib/dynamic-bootstrap';
 import _ from 'lodash';
 import path from 'path';
 import fs from 'fs';
@@ -15,14 +15,12 @@ import logger from '../../lib/logger';
 chai.use(chaiAsPromised);
 chai.should();
 
-let instrumentsUtils = instrumentsLib.utils;
-let getEnv = bootstrapLib.getEnv;
 
 process.env.APPIUM_BOOTSTRAP_DIR = '/tmp/appium-uiauto/test/functional/bootstrap';
 
 if (process.env.VERBOSE) logger.setConsoleLevel('debug');
 
-async function prepareBootstrap (opts) {
+async function localPrepareBootstrap (opts) {
   opts = opts || {};
   var rootDir = path.resolve(__dirname, '../../..');
   if (opts.bootstrap === 'basic') {
@@ -46,7 +44,7 @@ async function prepareBootstrap (opts) {
     for (let [key, value] of _.pairs(vars)) {
       code = code.replace(new RegExp(key, 'g'), value);
     }
-    return bootstrapLib.prepareBootstrap({
+    return prepareBootstrap({
       code: code,
       isVerbose: true
     });
@@ -58,12 +56,12 @@ async function prepareBootstrap (opts) {
         [path.resolve(rootDir, 'node_modules/chai/chai.js')];
     }
     delete opts.chai;
-    return bootstrapLib.prepareBootstrap(opts);
+    return prepareBootstrap(opts);
   }
 }
 
 async function newInstruments (bootstrapFile) {
-  return instrumentsUtils.quickInstrument({
+  return Instruments.utils.quickInstrument({
     app: path.resolve(__dirname, '../../../test/assets/UICatalog.app'),
     bootstrap: bootstrapFile,
     simulatorSdkAndDevice: 'iPhone 6 (8.1 Simulator)',
@@ -71,58 +69,49 @@ async function newInstruments (bootstrapFile) {
   });
 }
 
-async function init (bootstrapFile, opts) {
-  let deferred = Promise.pending();
-  let proxy = new CommandProxy(opts);
-  let instruments;
-  proxy.start(
-    // first connection
-    function (err) {
-      instruments.launchHandler(err);
-      if (err) return deferred.reject(err);
-      deferred.resolve({proxy: proxy, instruments: instruments});
-    },
-    // regular cb
-    async (err) => {
-      if (err) return deferred.reject(err);
-      instruments = await newInstruments(bootstrapFile);
-      instruments.start(null, function () {
-        proxy.safeShutdown(_.noop);
-        deferred.reject('Unexpected shutdown of instruments');
-      });
-    }
-  );
-  return deferred.promise;
+async function init (bootstrapFile, sock) {
+  let proxy = new UIAutoClient(sock);
+  let instruments = await newInstruments(bootstrapFile);
+  instruments.start(null, async () => {
+    await proxy.safeShutdown();
+    throw new Error('Unexpected shutdown of instruments');
+  });
+
+  try {
+    await proxy.start();
+    instruments.launchHandler();
+  } catch (err) {
+    // need to make sure instruments handles business
+    instruments.launchHandler(err);
+    throw err;
+  }
+  return {proxy, instruments};
 }
 
 async function killAll (ctx) {
   let asyncShutdown = Promise.promisify(ctx.instruments.shutdown, ctx.instruments);
-  await asyncShutdown();
-  await instrumentsUtils.killAllInstruments();
-  ctx.proxy.safeShutdown(_.noop);
+  try {
+    await asyncShutdown();
+  } catch (e) {
+    // pass
+    console.log(e);
+  }
+  await Instruments.utils.killAllInstruments();
+  await ctx.proxy.safeShutdown();
 }
 
 var bootstrapFile;
 
 async function globalInit (ctx, opts) {
-  // ctx.timeout(180000);
   ctx.timeout(20000);
 
-  bootstrapFile = await prepareBootstrap(opts);
+  bootstrapFile = await localPrepareBootstrap(opts);
 }
 
-async function instrumentsInstanceInit (opts) {
-  let ctx = await init(bootstrapFile, opts);
+async function instrumentsInstanceInit (opts = {}) {
+  let ctx = await init(bootstrapFile, opts.sock);
   ctx.sendCommand = async (cmd) => {
-    let deferred = Promise.pending();
-    ctx.proxy.sendCommand(cmd, (result) => {
-      if (result.status === 0) {
-        deferred.resolve(result.value);
-      } else {
-        deferred.reject(JSON.stringify(result));
-      }
-    });
-    return deferred.promise;
+    return ctx.proxy.sendCommand(cmd);
   };
   ctx.exec = ctx.sendCommand;
 

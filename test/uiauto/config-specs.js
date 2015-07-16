@@ -21,7 +21,7 @@ describe('config', function () {
 
     it('should use the alternate sock', function () {
       ctx.proxy.should.exist;
-      ctx.proxy.getSock().should.equal(altSock);
+      ctx.proxy.sock.should.equal(altSock);
     });
 
     it('should work', async () => {
