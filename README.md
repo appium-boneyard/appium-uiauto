@@ -3,11 +3,11 @@
 `uiauto` portion will remain as is, since it is run on the device, not in our ES6+ environment. What remains consists of three major parts:
 
 1. Command Proxy:
-      - acts as the bridge between Appium and Instruments
+      - acts as the bridge between `Appium` and the iOS UI Automation framework
       - will require significant async rewriting
       - two ends of the equation
-            - lib/command-proxy.js - should export CommandProxyClient
-            - uiauto/lib/commands.js - server. should be named more appropriately
+            - `lib/uiauto-client.js` - should export `UIAutoClient`
+            - `uiauto/lib/commands.js` - server. should be named more appropriately
 
 2. Dynamic Bootstrap:
       - creates the bootstrap environment to be pushed onto the device
@@ -15,6 +15,7 @@
 
 3. Dependency Resolver:
       - collates a dependency tree for the bootstrap app
+      - needs to be renamed according to its functionality - `createScript` or somesuch
       - currently synchronous, but uses synchronized fs functions, so rewrite to async
       - the logic can remain the same since the code parsed is old-style
 

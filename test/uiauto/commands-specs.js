@@ -29,7 +29,7 @@ describe('commands', function () {
     });
 
     it('should respond to invalid command and not die', async () => {
-      await ctx.sendCommand('i_am_invalid()').should.be.rejectedWith(/"status":17/);
+      await ctx.sendCommand('i_am_invalid()').should.be.rejectedWith(/Can't find variable: i_am_invalid/);
       await ctx.sendCommand("$.warn('still alive')");
     });
 
@@ -92,7 +92,7 @@ describe('commands', function () {
         else
           seq.push(async () => {
             await ctx.sendCommand('(ffffunction () { return "' + i + '"})()')
-              .should.be.rejectedWith(/"status":17/);
+              .should.be.rejectedWith(/Unexpected token/);
             // if ((i+1)%10 === 0) console.log('sent:', (i+1));
           });
       });
