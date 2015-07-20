@@ -2,7 +2,11 @@
 
 import { instrumentsInstanceInit, globalInit, killAll } from './base';
 import path from'path';
-import rimraf from 'rimraf';
+import _rimraf from 'rimraf';
+import Promise from 'bluebird';
+
+let rimraf = Promise.promisify(_rimraf);
+
 
 describe('config', function () {
   describe('custom socket', () => {
@@ -11,7 +15,7 @@ describe('config', function () {
 
     let ctx;
     before(async function () {
-      rimraf.sync(altSockDir);
+      await rimraf(altSockDir);
       await globalInit(this, { chai: true, sock: altSock });
       ctx = await instrumentsInstanceInit({ sock: altSock });
     });
