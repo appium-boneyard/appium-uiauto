@@ -13,7 +13,7 @@ describe('grace period', async () => {
     await globalInit(this, { imports: imports, bootstrap: 'basic'});
   });
 
-  describe('looking for unexistant object', async function () {
+  describe('looking for non-existant object', async function () {
     let ctx;
     before(async () => {
       ctx = await instrumentsInstanceInit();
