@@ -9,8 +9,12 @@ import Instruments from 'appium-instruments';
 import { getEnv } from '../../lib/dynamic-bootstrap';
 import _ from 'lodash';
 import path from 'path';
-import fs from 'fs';
+import _fs from 'fs';
 import logger from '../../lib/logger';
+
+let fs = {
+  readFile: Promise.promisify(_fs.readFile)
+};
 
 chai.use(chaiAsPromised);
 chai.should();
@@ -22,18 +26,18 @@ if (process.env.VERBOSE) logger.setConsoleLevel('debug');
 
 async function localPrepareBootstrap (opts) {
   opts = opts || {};
-  var rootDir = path.resolve(__dirname, '../../..');
+  let rootDir = path.resolve(__dirname, '../../..');
   if (opts.bootstrap === 'basic') {
-    var env = getEnv();
-    var postImports = [];
+    let env = getEnv();
+    let postImports = [];
     if (opts.imports && opts.imports.post) {
       postImports = opts.imports.post;
     }
     postImports = postImports.map(function (item) {
       return '#import "' + path.resolve( rootDir , item) + '"';
     });
-    var code = fs.readFileSync(path.resolve(
-      __dirname, '../../../test/assets/base-bootstrap.js.asset'), 'utf8');
+    let code = await fs.readFile(path.resolve(
+      __dirname, '../../../test/assets/base-bootstrap.js'), 'utf8');
     let vars = {
       '<ROOT_DIR>': rootDir,
       '"<POST_IMPORTS>"': postImports.join('\n'),
