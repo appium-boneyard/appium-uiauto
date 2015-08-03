@@ -2,13 +2,21 @@
 /* globals $ */
 
 import { instrumentsInstanceInit, globalInit, killAll } from './base';
+import { getVersion } from 'appium-xcode';
 import _ from 'lodash';
 import Promise from 'bluebird';
 
 
 describe('commands', function () {
+  let numCommands = 100;
   before(async () => {
     await globalInit(this, {bootstrap: 'basic'});
+
+    // xcode 7 is a bit slow.
+    let xcodeVersion = await getVersion();
+    if (xcodeVersion[0] >= 7) {
+      numCommands = 50;
+    }
   });
 
   describe('simple sequences', function () {
@@ -48,7 +56,7 @@ describe('commands', function () {
 
   });
 
-  describe('sending 100 valid commands', () => {
+  describe(`sending ${numCommands} valid commands`, () => {
     let ctx;
     before(async () => {
       ctx = await instrumentsInstanceInit();
@@ -59,7 +67,7 @@ describe('commands', function () {
 
     it('should work', async () => {
       let seq = [];
-      _.times(100, (i) => {
+      _.times(numCommands, (i) => {
         seq.push(async () => {
           (await ctx.sendCommand(`(function () { return "${i}"})()`)).should.equal(i.toString());
           // if ((i+1)%10 === 0) console.log('sent:', (i+1));
@@ -72,7 +80,7 @@ describe('commands', function () {
     });
   });
 
-  describe('sending 100 alternating valid and invalid', () => {
+  describe(`sending ${numCommands} alternating valid and invalid`, () => {
     let ctx;
     before(async () => {
       ctx = await instrumentsInstanceInit();
@@ -83,7 +91,7 @@ describe('commands', function () {
 
     it('should work', async () => {
       let seq = [];
-      _.times(100, (i) => {
+      _.times(numCommands, (i) => {
         if (i%2 === 0)
           seq.push(async () => {
             (await ctx.sendCommand(`(function () { return "${i}"})()`)).should.equal(i.toString());
