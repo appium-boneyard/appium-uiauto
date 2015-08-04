@@ -9,12 +9,8 @@ import Instruments from 'appium-instruments';
 import { getEnv } from '../../lib/dynamic-bootstrap';
 import _ from 'lodash';
 import path from 'path';
-import _fs from 'fs';
+import { fs } from 'appium-support';
 import logger from '../../lib/logger';
-
-let fs = {
-  readFile: Promise.promisify(_fs.readFile)
-};
 
 chai.use(chaiAsPromised);
 chai.should();
@@ -34,7 +30,7 @@ async function localPrepareBootstrap (opts) {
       postImports = opts.imports.post;
     }
     postImports = postImports.map(function (item) {
-      return '#import "' + path.resolve( rootDir , item) + '"';
+      return '#import "' + path.resolve(rootDir , item) + '"';
     });
     let code = await fs.readFile(path.resolve(
       __dirname, '../../../test/assets/base-bootstrap.js'), 'utf8');

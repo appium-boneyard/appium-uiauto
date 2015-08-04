@@ -2,19 +2,10 @@
 
 import { prepareBootstrap } from '../..';
 import log from '../../lib/logger';
-import { util } from 'appium-support';
-import Promise from 'bluebird';
 import chai from 'chai';
-import _fs from 'fs';
-import _rimraf from 'rimraf';
+import { fs, rimraf } from 'appium-support';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-
-let fs = {
-  exists: util.fileExists,
-  readFile: Promise.promisify(_fs.readFile)
-};
-let rimraf = Promise.promisify(_rimraf);
 
 chai.should();
 chai.use(sinonChai);

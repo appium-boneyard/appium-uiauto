@@ -2,10 +2,7 @@
 
 import { instrumentsInstanceInit, globalInit, killAll } from './base';
 import path from'path';
-import _rimraf from 'rimraf';
-import Promise from 'bluebird';
-
-let rimraf = Promise.promisify(_rimraf);
+import { rimraf } from 'appium-support';
 
 
 describe('config', function () {

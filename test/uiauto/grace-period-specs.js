@@ -2,6 +2,7 @@
 /* globals $ */
 
 import { instrumentsInstanceInit, globalInit, killAll } from './base';
+import { getVersion } from 'appium-xcode';
 
 
 describe('grace period', async () => {
@@ -14,9 +15,16 @@ describe('grace period', async () => {
   });
 
   describe('looking for non-existant object', async function () {
+    let expectedTime = 2000;
     let ctx;
     before(async () => {
       ctx = await instrumentsInstanceInit();
+
+      // xcode 7 is a bit slow.
+      let xcodeVersion = await getVersion();
+      if (xcodeVersion[0] >= 7) {
+        expectedTime = 4000;
+      }
     });
     after(async () => {
       await killAll(ctx);
@@ -29,8 +37,8 @@ describe('grace period', async () => {
           return $('#not exist');
         }
       );
+      (Date.now() - refMs).should.be.below(expectedTime);
       res.should.have.length(0);
-      (Date.now() - refMs).should.be.below(1000);
     });
 
     it('should be quick when pushing and popping 0 timeout', async () => {
@@ -44,7 +52,7 @@ describe('grace period', async () => {
         }
       );
       res.should.have.length(0);
-      (Date.now() - refMs).should.be.below(1000);
+      (Date.now() - refMs).should.be.below(expectedTime);
     });
 
     // Skipping because of bug, it takes more than 25 second!
