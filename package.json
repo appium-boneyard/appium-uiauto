@@ -31,8 +31,8 @@
   "dependencies": {
     "appium-instruments": "^2.0.4",
     "appium-logger": "^1.1.7",
-    "appium-support": "2.0.0-beta13",
-    "babel-runtime": "=5.5.5",
+    "appium-support": "beta",
+    "babel-runtime": "=5.8.20",
     "bluebird": "^2.9.32",
     "lodash": "^3.10.0",
     "mkdirp": "^0.5.1",
