@@ -91,10 +91,8 @@ var commands;
       $.debug(res.stdout);
       return null;
     }
-    $.warn('AKAK1 res.stdout ->' + res.stdout);
 
     var output = res.stdout.replace(/^(.*\n)*----- OUTPUT -----\r?\n/g, '');
-    $.warn('AKAK2 output ->' + output);
      return JSON.parse(output).cmd;
   };
 
