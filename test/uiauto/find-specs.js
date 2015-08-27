@@ -3,12 +3,10 @@
 
 import { instrumentsInstanceInit, globalInit, killAll } from './base';
 
-describe('find', async () => {
-  before(async function () {
-    await globalInit(this, { chai: true });
-  });
+describe('find', function () {
+  globalInit(this, {chai: true});
 
-  describe("textfields", async function () {
+  describe("textfields", function () {
     let ctx;
     before(async () => {
       ctx = await instrumentsInstanceInit();

@@ -6,14 +6,13 @@ import { rimraf } from 'appium-support';
 
 
 describe('config', function () {
-  describe('custom socket', () => {
+  describe('custom socket', function () {
     let altSockDir = '/tmp/abcd';
     let altSock = path.resolve(altSockDir, 'sock');
-
+    globalInit(this, {chai: true, sock: altSock});
     let ctx;
     before(async function () {
       await rimraf(altSockDir);
-      await globalInit(this, { chai: true, sock: altSock });
       ctx = await instrumentsInstanceInit({ sock: altSock });
     });
     after(async () => {

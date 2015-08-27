@@ -5,9 +5,9 @@ import { instrumentsInstanceInit, globalInit, killAll } from './base';
 
 describe('bootstrap', function () {
   describe('basic test bootstrap', function () {
+    globalInit(this, {bootstrap: 'basic'});
     let ctx;
     before(async function () {
-      await globalInit(this, {bootstrap: 'basic'});
       ctx = await instrumentsInstanceInit();
     });
     after(async () => {
@@ -22,9 +22,9 @@ describe('bootstrap', function () {
   });
 
   describe('regular bootstrap without chai', function () {
+    globalInit(this);
     let ctx;
     before(async function () {
-      await globalInit(this);
       ctx = await instrumentsInstanceInit();
     });
     after(async () => {
@@ -40,9 +40,9 @@ describe('bootstrap', function () {
   });
 
   describe("regular bootstrap with chai", function () {
+    globalInit(this, {bootstrap: 'basic'});
     let ctx;
     before(async function () {
-      await globalInit(this, {bootstrap: 'basic'});
       ctx = await instrumentsInstanceInit();
     });
     after(async () => {

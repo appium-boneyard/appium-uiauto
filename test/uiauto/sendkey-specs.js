@@ -9,11 +9,11 @@ describe('sendKey', async function () {
      'uiauto/lib/mechanic-ext/keyboard-ext.js',
     'uiauto/lib/element-patch/helper-patch.js'
   ]};
+  globalInit(this, {imports: imports, bootstrap: 'basic'});
 
   /* globals rootPage: true */
   let ctx;
   before(async function () {
-    await globalInit(this, { imports: imports, bootstrap: 'basic'});
     ctx = await instrumentsInstanceInit();
   });
   after(async () => {

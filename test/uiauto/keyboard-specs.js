@@ -5,17 +5,15 @@ import { instrumentsInstanceInit, globalInit, killAll } from './base';
 import _ from 'lodash';
 
 
-describe('keyboard', async () => {
+describe('keyboard', function () {
   let imports = { post: [
     'uiauto/lib/mechanic-ext/gesture-ext.js',
     'uiauto/lib/mechanic-ext/keyboard-ext.js',
     'uiauto/lib/element-patch/nil-patch.js'
   ]};
-  before(async function () {
-    await globalInit(this, { imports: imports, bootstrap: 'basic'});
-  });
+  globalInit(this, {imports: imports, bootstrap: 'basic'});
 
-  describe('hide keyboard', async function () {
+  describe('hide keyboard', function () {
     /* globals rootPage: true */
     let ctx;
     before(async () => {

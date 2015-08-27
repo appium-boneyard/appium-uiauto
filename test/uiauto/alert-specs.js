@@ -5,9 +5,9 @@ import { instrumentsInstanceInit, globalInit, killAll } from './base';
 
 instrumentsInstanceInit;
 
-describe('alarm', async function () {
+describe('alarm', function () {
   let imports = { post: [
-    'uiauto/lib/alerts.js',
+  'uiauto/lib/alerts.js',
     'uiauto/lib/status.js',
     'uiauto/lib/element-patch/nil-patch.js',
     'uiauto/lib/element-patch/helper-patch.js',
@@ -16,11 +16,9 @@ describe('alarm', async function () {
     'uiauto/lib/mechanic-ext/lookup-ext.js',
     'uiauto/lib/mechanic-ext/alert-ext.js'
   ]};
-  before(async () => {
-    await globalInit(this, { imports: imports, bootstrap: 'basic'});
-  });
+  globalInit(this, {imports: imports, bootstrap: 'basic'});
 
-  describe('textfields', async function () {
+  describe('textfields', function () {
     let ctx;
 
     before(async () => {

@@ -1,24 +1,19 @@
-// 'use strict';
-
-
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Promise from 'bluebird';
 import { UIAutoClient, prepareBootstrap } from '../..';
-import Instruments from 'appium-instruments';
+import { utils as instrumentsUtils } from 'appium-instruments';
 import { getEnv } from '../../lib/dynamic-bootstrap';
+import log from '../../lib/logger';
 import _ from 'lodash';
 import path from 'path';
 import { fs } from 'appium-support';
-import logger from '../../lib/logger';
 
 chai.use(chaiAsPromised);
 chai.should();
 
-
 process.env.APPIUM_BOOTSTRAP_DIR = '/tmp/appium-uiauto/test/functional/bootstrap';
 
-if (process.env.VERBOSE) logger.setConsoleLevel('debug');
 
 async function localPrepareBootstrap (opts) {
   opts = opts || {};
@@ -61,7 +56,7 @@ async function localPrepareBootstrap (opts) {
 }
 
 async function newInstruments (bootstrapFile) {
-  return Instruments.utils.quickInstrument({
+  return instrumentsUtils.quickInstruments({
     app: path.resolve(__dirname, '../../../test/assets/UICatalog.app'),
     bootstrap: bootstrapFile,
     simulatorSdkAndDevice: 'iPhone 6 (8.1 Simulator)',
@@ -72,40 +67,42 @@ async function newInstruments (bootstrapFile) {
 async function init (bootstrapFile, sock) {
   let proxy = new UIAutoClient(sock);
   let instruments = await newInstruments(bootstrapFile);
-  instruments.start(null, async () => {
-    await proxy.safeShutdown();
-    throw new Error('Unexpected shutdown of instruments');
-  });
-
-  try {
-    await proxy.start();
-    instruments.launchHandler();
-  } catch (err) {
-    // need to make sure instruments handles business
-    instruments.launchHandler(err);
-    throw err;
-  }
+  instruments.onShutdown
+    .then(() => {
+      // expected shutdown, nothing to do
+    }).catch(async (err) => {
+      log.error(err);
+      await proxy.safeShutdown();
+      throw new Error('Unexpected shutdown of instruments');
+    }).done();
+  await Promise.all([
+    proxy.start().then(() => {
+      // everything looks good, notify instruments.
+      instruments.registerLaunch();
+    }),
+    instruments.launch()
+  ]);
   return {proxy, instruments};
 }
 
 async function killAll (ctx) {
-  let asyncShutdown = Promise.promisify(ctx.instruments.shutdown, ctx.instruments);
   try {
-    await asyncShutdown();
+    await ctx.instruments.shutdown();
   } catch (e) {
     // pass
-    console.log(e);
+    log.error(e);
   }
-  await Instruments.utils.killAllInstruments();
+  await instrumentsUtils.killAllInstruments();
   await ctx.proxy.safeShutdown();
 }
 
 var bootstrapFile;
 
 async function globalInit (ctx, opts) {
-  ctx.timeout(20000);
-
-  bootstrapFile = await localPrepareBootstrap(opts);
+  ctx.timeout(60000);
+  before(async () => {
+    bootstrapFile = await localPrepareBootstrap(opts);
+  });
 }
 
 async function instrumentsInstanceInit (opts = {}) {

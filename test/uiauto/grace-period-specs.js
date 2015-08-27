@@ -5,16 +5,14 @@ import { instrumentsInstanceInit, globalInit, killAll } from './base';
 import { getVersion } from 'appium-xcode';
 
 
-describe('grace period', async () => {
+describe('grace period', function () {
   let imports = { post: [
     'uiauto/lib/mechanic-ext/gesture-ext.js',
     'uiauto/lib/mechanic-ext/keyboard-ext.js',
   ]};
-  before(async function () {
-    await globalInit(this, { imports: imports, bootstrap: 'basic'});
-  });
+  globalInit(this, {imports: imports, bootstrap: 'basic'});
 
-  describe('looking for non-existant object', async function () {
+  describe('looking for non-existant object', function () {
     let expectedTime = 2000;
     let ctx;
     before(async () => {

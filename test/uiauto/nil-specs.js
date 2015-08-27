@@ -4,14 +4,14 @@
 import { instrumentsInstanceInit, globalInit, killAll } from './base';
 
 
-describe('nil', async function () {
+describe('nil', function () {
   let imports = { post: [
     'uiauto/lib/element-patch/nil-patch.js',
     'uiauto/lib/mechanic-ext/basics-ext.js'
   ]};
+  globalInit(this, {imports: imports, bootstrap: 'basic'});
   let ctx;
   before(async function () {
-    await globalInit(this, { imports: imports, bootstrap: 'basic'});
     ctx = await instrumentsInstanceInit();
   });
   after(async () => {

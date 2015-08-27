@@ -8,10 +8,9 @@ import Promise from 'bluebird';
 
 
 describe('commands', function () {
+  globalInit(this, {bootstrap: 'basic'});
   let numCommands = 100;
   before(async () => {
-    await globalInit(this, {bootstrap: 'basic'});
-
     // xcode 7 is a bit slow.
     let xcodeVersion = await getVersion();
     if (xcodeVersion[0] >= 7) {

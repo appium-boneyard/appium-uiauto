@@ -29,13 +29,13 @@
     "lib": "lib"
   },
   "dependencies": {
-    "appium-instruments": "^2.0.4",
+    "appium-instruments": "beta",
     "appium-logger": "^1.1.7",
     "appium-support": "beta",
     "babel-runtime": "=5.8.20",
     "bluebird": "^2.9.32",
     "lodash": "^3.10.0",
-    "mkdirp": "^0.5.1",
+    "mobile-json-wire-protocol": "latest",
     "source-map-support": "^0.3.1",
     "through": "^2.3.8"
   },
@@ -46,11 +46,12 @@
   },
   "devDependencies": {
     "appium-gulp-plugins": "^1.2.12",
-    "appium-xcode": "^2.0.5",
+    "appium-xcode": "beta",
     "chai": "^3.0.0",
     "chai-as-promised": "^5.1.0",
     "gulp": "^3.8.11",
     "mochawait": "^2.0.0",
+    "npmlog": "^1.2.1",
     "q": "^1.4.1",
     "sinon": "^1.15.4",
     "sinon-chai": "^2.8.0"
