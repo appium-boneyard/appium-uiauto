@@ -5,14 +5,9 @@
     "appium",
     "ios"
   ],
-  "version": "2.0.0-beta5",
+  "version": "2.0.0-beta6",
   "author": "appium",
-  "licenses": [
-    {
-      "type": "apache-2.0",
-      "url": "https://raw.github.com/appium/appium/master/LICENSE"
-    }
-  ],
+  "licenses": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/appium/appium-uiauto.git"
@@ -30,9 +25,9 @@
   },
   "dependencies": {
     "appium-instruments": "beta",
-    "appium-logger": "^1.1.7",
-    "appium-support": "beta",
-    "babel-runtime": "=5.8.20",
+    "appium-logger": "^2.0.0",
+    "appium-support": "^2.0.0",
+    "babel-runtime": "=5.8.24",
     "bluebird": "^2.9.32",
     "lodash": "^3.10.0",
     "mobile-json-wire-protocol": "latest",

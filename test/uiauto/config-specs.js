@@ -2,7 +2,7 @@
 
 import { instrumentsInstanceInit, globalInit, killAll } from './base';
 import path from'path';
-import { rimraf } from 'appium-support';
+import { fs } from 'appium-support';
 
 
 describe('config', function () {
@@ -12,7 +12,7 @@ describe('config', function () {
     globalInit(this, {chai: true, sock: altSock});
     let ctx;
     before(async function () {
-      await rimraf(altSockDir);
+      await fs.rimraf(altSockDir);
       ctx = await instrumentsInstanceInit({ sock: altSock });
     });
     after(async () => {
