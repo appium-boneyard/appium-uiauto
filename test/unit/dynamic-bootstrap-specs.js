@@ -3,7 +3,7 @@
 import { prepareBootstrap } from '../..';
 import log from '../../lib/logger';
 import chai from 'chai';
-import { fs, rimraf } from 'appium-support';
+import { fs } from 'appium-support';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 
@@ -39,7 +39,7 @@ describe('dynamic bootstrap', function () {
 
   it('should generate dynamic bootstrap', async () => {
     process.env.APPIUM_BOOTSTRAP_DIR = '/tmp/appium-uiauto/test/unit/bootstrap';
-    await rimraf(process.env.APPIUM_BOOTSTRAP_DIR);
+    await fs.rimraf(process.env.APPIUM_BOOTSTRAP_DIR);
 
       // first call: should create new bootstrap file
     let bootstrapFile = await prepareBootstrap();
