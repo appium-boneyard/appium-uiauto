@@ -6,6 +6,8 @@ import chai from 'chai';
 import { fs } from 'appium-support';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
+import path from 'path';
+
 
 chai.should();
 chai.use(sinonChai);
@@ -38,8 +40,10 @@ describe('dynamic bootstrap', function () {
   });
 
   it('should generate dynamic bootstrap', async () => {
-    process.env.APPIUM_BOOTSTRAP_DIR = '/tmp/appium-uiauto/test/unit/bootstrap';
-    await fs.rimraf(process.env.APPIUM_BOOTSTRAP_DIR);
+    process.env.APPIUM_BOOTSTRAP_DIR = path.resolve('/', 'tmp', 'appium-uiauto', 'test', 'unit', 'bootstrap');
+    if (await fs.exists(process.env.APPIUM_BOOTSTRAP_DIR)) {
+      await fs.rimraf(process.env.APPIUM_BOOTSTRAP_DIR);
+    }
 
       // first call: should create new bootstrap file
     let bootstrapFile = await prepareBootstrap();

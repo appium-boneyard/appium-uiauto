@@ -9,8 +9,8 @@ describe('config', function () {
   describe('custom socket', function () {
     let altSockDir = '/tmp/abcd';
     let altSock = path.resolve(altSockDir, 'sock');
-    globalInit(this, {chai: true, sock: altSock});
     let ctx;
+    globalInit(this, {chai: true, sock: altSock});
     before(async function () {
       await fs.rimraf(altSockDir);
       ctx = await instrumentsInstanceInit({ sock: altSock });

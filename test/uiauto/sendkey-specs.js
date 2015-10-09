@@ -4,7 +4,7 @@
 import { instrumentsInstanceInit, globalInit, killAll } from './base';
 import _ from 'lodash';
 
-describe('sendKey', async function () {
+describe('sendKey', function () {
   let imports = { post: [
      'uiauto/lib/mechanic-ext/keyboard-ext.js',
     'uiauto/lib/element-patch/helper-patch.js'
