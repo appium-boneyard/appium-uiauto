@@ -41,6 +41,8 @@
 
     , bundleId: function () { return $.mainApp().bundleID(); }
 
+    , systemVersion: UIATarget.localTarget().systemVersion()
+    
     // overriding existing delay
     , delay: function (ms) { delaySec.call(this, ms/1000); }
 

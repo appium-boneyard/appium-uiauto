@@ -38,7 +38,11 @@
 
   , typeKey: function (k) {
       if (k === '\uE003' || k === '\ue017') { // BACKSPACE or DELETE
-        $.keyboard().keys().Delete.tap();
+        if (parseFloat($.systemVersion) >= 9.1) {
+          $.keyboard().keys().delete.tap();
+        } else {
+          $.keyboard().keys().Delete.tap();
+        }
       } else if (k === '\uE006' || k === '\uE007') {// RETURN ENTER
         $.keyboard().typeString("\n");
       } else {
