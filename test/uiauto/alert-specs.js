@@ -7,7 +7,7 @@ instrumentsInstanceInit;
 
 describe('alarm', function () {
   let imports = { post: [
-  'uiauto/lib/alerts.js',
+    'uiauto/lib/alerts.js',
     'uiauto/lib/status.js',
     'uiauto/lib/element-patch/nil-patch.js',
     'uiauto/lib/element-patch/helper-patch.js',

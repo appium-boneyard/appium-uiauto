@@ -4,4 +4,3 @@ import * as utils from './lib/utils';
 
 export { prepareBootstrap, UIAutoClient, utils };
 export default UIAutoClient;
-
