@@ -1,40 +1,115 @@
-# Appium-UIAuto rewrite
+## Appium-UIAuto
 
-`uiauto` portion will remain as is, since it is run on the device, not in our ES6+ environment. What remains consists of three major parts:
+[![NPM version](http://img.shields.io/npm/v/appium-uiauto.svg)](https://npmjs.org/package/appium-uiauto)
+[![Downloads](http://img.shields.io/npm/dm/appium-uiauto.svg)](https://npmjs.org/package/appium-uiauto)
+[![Dependency Status](https://david-dm.org/appium/appium-uiauto/2.0.svg)](https://david-dm.org/appium/appium-uiauto/2.0)
+[![devDependency Status](https://david-dm.org/appium/appium-uiauto/2.0/dev-status.svg)](https://david-dm.org/appium/appium-uiauto/2.0#info=devDependencies)
 
-1. Command Proxy:
-      - acts as the bridge between `Appium` and the iOS UI Automation framework
-      - will require significant async rewriting
-      - two ends of the equation
-            - `lib/uiauto-client.js` - should export `UIAutoClient`
-            - `uiauto/lib/commands.js` - server. should be named more appropriately
-
-2. Dynamic Bootstrap:
-      - creates the bootstrap environment to be pushed onto the device
-      - currently synchronous, but uses synchronized fs functions, and returns a Promise, so modify to async so we handle things in the same way
-
-3. Dependency Resolver:
-      - collates a dependency tree for the bootstrap app
-      - needs to be renamed according to its functionality - `createScript` or somesuch
-      - currently synchronous, but uses synchronized fs functions, so rewrite to async
-      - the logic can remain the same since the code parsed is old-style
-
-And, of course... tests.
+[![Build Status](https://api.travis-ci.org/appium/appium-uiauto.png?branch=2.0)](https://travis-ci.org/appium/appium-uiauto)
+[![Coverage Status](https://coveralls.io/repos/appium/appium-uiauto/badge.svg?branch=2.0)](https://coveralls.io/r/appium/appium-uiauto?branch=2.0)
 
 
+Appium interface for the iOS [UI Automation](https://developer.apple.com/library/watchos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/UIAutomation.html) framework. Provides access to the JavaScript [API](https://developer.apple.com/library/ios/documentation/DeveloperTools/Reference/UIAutomationRef/).
+
+Consists of a client, `UIAutoClient`, through which you interact with the iOS UI Automation framework, and a server which is embedded on the device, running the commands in the context of the running application.
+
+In addition, there is a tool, `prepareBootstrap`, which builds a script which will be inserted onto the device. Any code that is necessary for running the commands can be added through that tool.
 
 
-This rewrite will pull in most of the iOS behavioural tests from Appium. This seems a good time to revisit our tests both in terms of organization and coverage.
+### Usage
+
+#### `UIAutoClient`
+
+The client is used to send JavaScript commands to the device. It needs to be instantiated with a socket location (which defaults to `/tmp/instruments_sock`), and started, after which commands can be sent using the `sendCommand` method:
+
+```js
+import UIAutoClient from 'appium-uiauto';
 
 
+let client = new UIAutoClient();
+client.start();
 
-Dependencies for moving tests out of Appium:
+// send a command to get the source code for the view
+let source = await this.uiAutoClient.sendCommand('au.mainApp().getTreeForXML()');
+```
 
-1. Requires a way to start/stop simulator and load app (appium-ios-simulator?).
+In practice the instantiation of the `UIAutoClient` is usually coupled with launching instruments for automating the device. This is handled by awaiting the promises from both that start of `UIAutoClient` and the launch of [`Instruments`](https://github.com/appium/appium-instruments):
 
-2. Requires a way to start instruments with the bootstrap code (appium-instruments?).
+```js
+import UIAutoClient from 'appium-uiauto';
+import { Instruments, utils } from 'appium-instruments';
 
-3. Rethink our test organization
-      - move from app-based organization to functionality-based. Find, action, etc. While it seems unlikely that we will have a new test app to test against by the time this happens, idealy at some point everything would be tested against a single app, and some of the initial complexity (e.g., having one test run against one app, and another test run against another) would go away.
-      - This would be a good time to keep track of the desiderata for a new test app. What tests do we have that have no assertions because there is nothing appropriate to check for? What tests require going through a long setup to get to the place where the feature can be tested? Where is there unnecessary complexity that makes false negatives likely?
-      - We currently have some cases where we test the same feature multiple times, and other features not at all. Reorganizing will allow us to merge tests, and make the holes more obvious.
+let uiAutoClient = new UIAutoClient();
+let instruments = await utils.quickInstruments();
+
+await B.all([
+  uiAutoClient.start().then(() => { instruments.registerLaunch(); }),
+  instruments.launch()
+]);
+
+let source = await this.uiAutoClient.sendCommand('au.mainApp().getTreeForXML()');
+```
+
+#### `prepareBootstrap`
+
+The second important function is `prepareBootstrap`, which is used to create the script which will be injected into the device. This includes custom Appium UI Automation code to fix certain functionality, as well as any other code that necessary.
+
+Basic usage of `prepareBootstrap` creates a file with all of the Appium UI Automation code collated into one long script, which can then be put onto the device when launching Instruments:
+
+```js
+import { prepareBootstrap } from 'appium-uiauto';
+
+let bootstrapPath = await prepareBootstrap();
+```
+
+Further, `prepareBootstrap` can take a hash with any of the following values:
+
+- `sock` - the location of the instruments socket (defaults to `/tmp/instruments_sock`)
+- `interKeyDelay` - the time, in `ms`, to pause between keystrokes when typing
+- `justLoopInfinitely` - tells the server not to stop looking for new commands
+- `autoAcceptAlerts` - automatically accept alerts as they arise
+- `autoDismissAlerts` - automatically accept alerts as they arise
+- `sendKeyStrategy` - the "strategy" for typing. This can be
+      - `oneByOne` - type as normal, one key at a time
+      - `grouped` - group together keys to be sent all at once
+      - `setValue` - bypass the keyboard and directly set the value on the element rather than actually typing
+
+The last option that can be sent in is `imports.pre`, through which is sent an array of paths to any JavaScript files to be added to the generated script. This is the means by which custom libraries can be added to the environment:
+
+```js
+import { prepareBootstrap } from 'appium-uiauto';
+
+let bootstrapPath = await prepareBootstrap({
+  sock: '/path/to/my/instruments_socket',
+  interKeyDelay: 500,
+  justLoopInfinitely: false,
+  autoAcceptAlerts: true,
+  autoDismissAlerts: true,
+  sendKeyStrategy: 'oneByOne',
+  imports: {
+    pre: [
+      '/path/to/my/first/import',
+      '/path/to/my/second/import'
+    ]
+  }
+});
+```
+#### `utils`
+
+The `utils` object has a single helper function, `rotateImage`, which takes the path to an image, and the degrees to rotate, and executes a custom AppleScript function to rotate the image appropriately. Used to handle screenshots in Appium.
+
+```js
+import { utils } from 'appium-uiauto';
+import { fs } from 'appium-support';
+
+// set up client as appropriate
+// ...
+
+let shotFile = '/path/to/file/for/screenshot';
+await uiAutoClient.sendCommand(`au.capture('${shotFile}')`);
+
+// rotate the image
+await utils.rotateImage(shotPath, -90);
+
+let screenshot = await fs.readFile(shotPath);
+```
