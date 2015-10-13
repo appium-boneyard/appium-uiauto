@@ -4,7 +4,7 @@
 import { instrumentsInstanceInit, globalInit, killAll } from './base';
 import { getVersion } from 'appium-xcode';
 import _ from 'lodash';
-import Promise from 'bluebird';
+import B from 'bluebird';
 
 
 describe('commands', function () {
@@ -47,7 +47,7 @@ describe('commands', function () {
           (await ctx.sendCommand(`(function () { return ${i}})()`)).should.equal(i);
         });
       });
-      await Promise.reduce(seq, async (res, task) => {
+      await B.reduce(seq, async (res, task) => {
         await res;
         return task();
       }, null);
@@ -72,7 +72,7 @@ describe('commands', function () {
           // if ((i+1)%10 === 0) console.log('sent:', (i+1));
         });
       });
-      await Promise.reduce(seq, async (res, task) => {
+      await B.reduce(seq, async (res, task) => {
         await res;
         return task();
       }, null);
@@ -103,7 +103,7 @@ describe('commands', function () {
             // if ((i+1)%10 === 0) console.log('sent:', (i+1));
           });
       });
-      await Promise.reduce(seq, async (res, task) => {
+      await B.reduce(seq, async (res, task) => {
         await res;
         return task();
       }, null);

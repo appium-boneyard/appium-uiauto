@@ -16,7 +16,9 @@ describe('alarm', function () {
     'uiauto/lib/mechanic-ext/lookup-ext.js',
     'uiauto/lib/mechanic-ext/alert-ext.js'
   ]};
+
   globalInit(this, {imports: imports, bootstrap: 'basic'});
+
 
   describe('textfields', function () {
     let ctx;
@@ -52,7 +54,7 @@ describe('alarm', function () {
           return alertText;
         }
       );
-      res.should.include('A Short Title Is Best');
+      res.should.include('A message should be a short, complete sentence');
     });
   });
 });

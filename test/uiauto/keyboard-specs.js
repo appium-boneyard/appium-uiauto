@@ -13,7 +13,7 @@ describe('keyboard', function () {
   ]};
   globalInit(this, {imports: imports, bootstrap: 'basic'});
 
-  describe.only('hide keyboard', function () {
+  describe('hide keyboard', function () {
     /* globals rootPage: true */
     let ctx;
     before(async () => {
