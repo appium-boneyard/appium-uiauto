@@ -53,8 +53,8 @@
       if (!alert.isNil()) {
         var acceptButton = alert.defaultButton();
         var buttonCount = alert.buttons().length;
-        // iOS9.1 returns 'cancel' as the default button.
-        if ((parseFloat($.systemVersion) >= 9.1 && buttonCount > 0) ||
+        // iOS9.0 returns 'cancel' as the default button.
+        if ((parseFloat($.systemVersion) >= 9.0 && buttonCount > 0) ||
             (acceptButton.isNil() && buttonCount > 0)) {
           // last button is accept
           acceptButton = alert.buttons()[buttonCount - 1];
