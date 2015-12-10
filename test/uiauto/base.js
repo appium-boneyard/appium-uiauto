@@ -71,6 +71,7 @@ async function newInstruments (bootstrapFile) {
     simulatorSdkAndDevice = 'iPhone 6 (8.4)';
     withoutDelay = false;
   }
+
   return await instrumentsUtils.quickInstruments({
     app: path.resolve(rootDir, 'test', 'assets', 'UICatalog.app'),
     bootstrap: bootstrapFile,
