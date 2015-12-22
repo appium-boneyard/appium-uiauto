@@ -54,7 +54,8 @@ describe('alarm', function () {
           return alertText;
         }
       );
-      res.should.include('A message should be a short, complete sentence');
+      res.should.include('A Short Title Is Best');
+      res.should.include('A message should be a short, complete sentence.');
     });
   });
 });
