@@ -27,8 +27,8 @@
         if (text.indexOf('http') === 0 || text === "") {
           text = texts.last().name();
         } else {
-          text = texts[texts.length - 2].name();
-          var subtext = texts.last().name();
+          text = texts[0].name();
+          var subtext = texts[1].name();
           if (subtext !== null) {
             text = text + ' ' + subtext;
           }

@@ -1,21 +1,25 @@
+// transpile:mocha
 /* globals $ */
-'use strict';
 
-var base = require('./base');
+import { instrumentsInstanceInit, globalInit, killAll } from './base';
+
 
 describe('nil', function () {
-  var imports = { post: [
+  let imports = { post: [
     'uiauto/lib/element-patch/nil-patch.js',
     'uiauto/lib/mechanic-ext/basics-ext.js'
   ]};
-  base.globalInit(this, { imports: imports, bootstrap: 'basic'});
+  globalInit(this, {imports: imports, bootstrap: 'basic'});
+  let ctx;
+  before(async function () {
+    ctx = await instrumentsInstanceInit();
+  });
+  after(async () => {
+    await killAll(ctx);
+  });
 
-  var ctx;
-  base.instrumentsInstanceInit()
-    .then(function (_ctx) { ctx = _ctx; }).done();
-
-  afterEach(function () {
-    return ctx.execFunc(
+  afterEach(async () => {
+    await ctx.execFunc(
       function () {
         $('#UICatalog').first().tap();
         $.delay(1000);
@@ -23,38 +27,30 @@ describe('nil', function () {
     );
   });
 
-  it('isNil should return true for not nil elements', function () {
-    return ctx.execFunc(
+  it('isNil should return true for not nil elements', async () => {
+    let res = await ctx.execFunc(
       function () {
         return $('cell')[0].isNil();
       }
-    ).then(function (res) {
-      console.warn('res -->', res);
-      res.should.not.be.ok;
-    });
+    );
+    res.should.be.false;
   });
 
-  it('isNil should return true for nil elements', function () {
-    return ctx.execFunc(
+  it('isNil should return true for nil elements', async () => {
+    let res = await ctx.execFunc(
       function () {
         return $('cell')[0].images().isNil();
       }
-    ).then(function (res) {
-      console.warn('res -->', res);
-      res.should.be.ok;
-    });
+    );
+    res.should.be.true;
   });
 
-  it('isNil should return true for manually created UIAElementNil', function () {
-    return ctx.execFunc(
+  it('isNil should return true for manually created UIAElementNil', async () => {
+    let res = await ctx.execFunc(
       function () {
         return $.nil.isNil();
       }
-    ).then(function (res) {
-      console.warn('res -->', res);
-      res.should.be.ok;
-    });
+    );
+    res.should.be.true;
   });
-
-
 });

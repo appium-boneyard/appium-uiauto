@@ -91,8 +91,9 @@ var commands;
       $.debug(res.stdout);
       return null;
     }
+
     var output = res.stdout.replace(/^(.*\n)*----- OUTPUT -----\r?\n/g, '');
-    return JSON.parse(output).cmd;
+     return JSON.parse(output).cmd;
   };
 
   var getFirstCommand = function () {

@@ -1,103 +1,127 @@
+// transpile:mocha
 /* globals $ */
-'use strict';
 
-var base = require('./base'),
-    _ = require('underscore'),
-    Q = require('q');
+import { instrumentsInstanceInit, globalInit, killAll } from './base';
+import { getVersion } from 'appium-xcode';
+import _ from 'lodash';
+import B from 'bluebird';
+
 
 describe('commands', function () {
-  base.globalInit(this, {bootstrap: 'basic'});
+  globalInit(this, {bootstrap: 'basic'});
+  let numCommands = 100;
+  before(async () => {
+    // xcode 7 is a bit slow.
+    let xcodeVersion = await getVersion();
+    if (xcodeVersion[0] >= 7) {
+      numCommands = 50;
+    }
+  });
 
-  describe("simple sequences", function () {
-    var ctx;
-    base.instrumentsInstanceInit().then(function (_ctx) { ctx = _ctx; });
-
-    it('should send one valid command returning a value', function () {
-      return ctx.sendCommand("'123'")
-        .should.become('123');
+  describe('simple sequences', function () {
+    let ctx;
+    before(async () => {
+      ctx = await instrumentsInstanceInit();
+    });
+    after(async () => {
+      await killAll(ctx);
     });
 
-    it('should send one valid command returning empty value', function () {
-      return ctx.sendCommand("$.warn('starting')")
-        .should.become('');
+    it('should send one valid command returning a value', async () => {
+      (await ctx.sendCommand("'123'")).should.equal('123');
     });
 
-    it('should respond to invalid command and not die', function () {
-      return ctx.sendCommand("i_am_invalid()")
-        .should.be.rejectedWith(/"status":17/)
-        .then(function () {
-          return ctx.sendCommand("$.warn('still alive')");
-        });
+    it('should send one valid command returning empty value', async () => {
+      (await ctx.sendCommand("$.warn('starting')")).should.equal('');
     });
 
-    it('should repond to 10 commands in a row', function () {
-      var seq = [];
-      _(10).times(function (i) {
-        seq.push(function () {
-          return ctx.sendCommand('(function () { return ' + i + '})()')
-            .should.become(i);
+    it('should respond to invalid command and not die', async () => {
+      await ctx.sendCommand('i_am_invalid()').should.be.rejectedWith(/Can't find variable: i_am_invalid/);
+      await ctx.sendCommand("$.warn('still alive')");
+    });
+
+    it('should repond to 10 commands in a row', async () => {
+      let seq = [];
+      _.times(10, function (i) {
+        seq.push(async () => {
+          (await ctx.sendCommand(`(function () { return ${i}})()`)).should.equal(i);
         });
       });
-      return seq.reduce(Q.when, new Q());
+      await B.reduce(seq, async (res, task) => {
+        await res;
+        return task();
+      }, null);
     });
 
   });
 
-  describe("sending 100 valid commands", function () {
-    var ctx;
-    base.instrumentsInstanceInit().then(function (_ctx) { ctx = _ctx; });
-
-   it('should work', function () {
-      var seq = [];
-      _(100).times(function (i) {
-        seq.push(function () {
-          return ctx.sendCommand('(function () { return "' + i + '"})()')
-            .should.become("" + i)
-            .then(function () {
-              if ((i+1)%10 === 0) console.log('sent:', (i+1));
-            });
-        });
-      });
-      return seq.reduce(Q.when, new Q());
+  describe(`sending ${numCommands} valid commands`, () => {
+    let ctx;
+    before(async () => {
+      ctx = await instrumentsInstanceInit();
+    });
+    after(async () => {
+      await killAll(ctx);
     });
 
+    it('should work', async () => {
+      let seq = [];
+      _.times(numCommands, (i) => {
+        seq.push(async () => {
+          (await ctx.sendCommand(`(function () { return "${i}"})()`)).should.equal(i.toString());
+          // if ((i+1)%10 === 0) console.log('sent:', (i+1));
+        });
+      });
+      await B.reduce(seq, async (res, task) => {
+        await res;
+        return task();
+      }, null);
+    });
   });
 
-  describe("sending 100 alternating valid and invalid", function () {
-    var ctx;
-    base.instrumentsInstanceInit().then(function (_ctx) { ctx = _ctx; });
+  describe(`sending ${numCommands} alternating valid and invalid`, () => {
+    let ctx;
+    before(async () => {
+      ctx = await instrumentsInstanceInit();
+    });
+    after(async () => {
+      await killAll(ctx);
+    });
 
-   it('should work', function () {
-      var seq = [];
-      _(100).times(function (i) {
+    it('should work', async () => {
+      let seq = [];
+      _.times(numCommands, (i) => {
         if (i%2 === 0)
-          seq.push(function () {
-            return ctx.sendCommand('(function () { return "' + i + '"})()')
-              .should.become("" + i)
-              .then(function () {
-                if ((i+1)%10 === 0) console.log('sent:', (i+1));
-              });
+          seq.push(async () => {
+            (await ctx.sendCommand(`(function () { return "${i}"})()`)).should.equal(i.toString());
+            // if ((i+1)%10 === 0) console.log('sent:', (i+1));
           });
         else
-          seq.push(function () {
-            return ctx.sendCommand('(ffffunction () { return "' + i + '"})()')
-              .should.be.rejectedWith(/"status":17/)
-              .then(function () {
-                if ((i+1)%10 === 0) console.log('sent:', (i+1));
-              });
+          seq.push(async () => {
+            await ctx.sendCommand('(ffffunction () { return "' + i + '"})()')
+              .should.be.rejectedWith(/Unexpected token/);
+            // if ((i+1)%10 === 0) console.log('sent:', (i+1));
           });
       });
-      return seq.reduce(Q.when, new Q());
+      await B.reduce(seq, async (res, task) => {
+        await res;
+        return task();
+      }, null);
     });
 
   });
 
-  describe("command with big result", function () {
-    var ctx;
-    base.instrumentsInstanceInit().then(function (_ctx) { ctx = _ctx; });
+  describe('command with big result', () => {
+    let ctx;
+    before(async () => {
+      ctx = await instrumentsInstanceInit();
+    });
+    after(async () => {
+      await killAll(ctx);
+    });
 
     // UIAuto code
-    var configureUIAuto = function () {
+    let configureUIAuto = () => {
       $.extend($, {
         oneMamaLongString: function (n, mapping) {
           var i;
@@ -115,7 +139,6 @@ describe('commands', function () {
         },
 
         oneMamaHugeTree: function (n, d) {
-          //var root = {name: 'root'};
           function addChildren(root, depth) {
             if (depth === d) return;
             root.children = {};
@@ -133,21 +156,19 @@ describe('commands', function () {
       });
     };
 
-    before(function () {
-      return ctx.execFunc(configureUIAuto);
+    before(async () => {
+      await ctx.execFunc(configureUIAuto);
     });
 
-    var testN = function (n) {
-      return ctx.sendCommand('$.oneMamaLongString(' + n + ')')
-        .then(function (s) {
-          s.should.have.length(n);
-          _(n).times(function (i) {
-            parseInt(s[i] , 10).should.equal(i%10);
-          });
-        });
+    let testN = async (n) => {
+      let s = await ctx.sendCommand(`$.oneMamaLongString(${n})`);
+      s.should.have.length(n);
+      _.times(n, function (i) {
+        parseInt(s[i] , 10).should.equal(i%10);
+      });
     };
 
-    it('should work a small string', function () {
+    it('should work a small string', () => {
       return testN(1000);
     });
 
@@ -159,39 +180,40 @@ describe('commands', function () {
       return testN(1000000);
     });
 
-    var testNWithSpaces = function (n) {
-      return ctx.sendCommand("$.oneMamaLongString(" + n + ",[0,1,2,3,4,' ',6,7,8,9])")
-        .then(function (s) {
-          s.should.have.length(n);
-          _(n).times(function (i) {
-            if (i%10 === 5){
-              s[i].should.equal(' ');
-            } else {
-              parseInt(s[i] , 10).should.equal(i%10);
-            }
-          });
-        });
+    let testNWithSpaces = async (n) => {
+      let s = await ctx.sendCommand(`$.oneMamaLongString(${n}, [0,1,2,3,4,' ',6,7,8,9])`);
+      s.should.have.length(n);
+      _.times(n, function (i) {
+        if (i%10 === 5){
+          s[i].should.equal(' ');
+        } else {
+          parseInt(s[i] , 10).should.equal(i%10);
+        }
+      });
     };
 
     it('should work with a big string with spaces', function () {
       return testNWithSpaces(200000);
     });
 
-    var getHugeTree = function (n,d) {
-      return ctx.sendCommand('$.oneMamaHugeTree(' + n + ', ' + d + ')');
+    let getHugeTree = async (n, d) => {
+      return ctx.sendCommand(`$.oneMamaHugeTree(${n}, ${d})`);
     };
 
-    it('should work with a medium tree', function () {
-      return getHugeTree(5,3);
+    it('should work with a medium tree', async () => {
+      let res = await getHugeTree(5, 3);
+      res.name.should.equal('root');
+      res.children.c1.children.c2.children
+        .c3.name.should.equal('child 3');
+      JSON.stringify(res).length.should.be.above(4000);
     });
 
-    it('should work with a huge tree', function () {
-      return getHugeTree(5,7).then(function (res) {
-        res.name.should.equal('root');
-        res.children.c1.children.c2.children
-          .c3.children.c2.name.should.equal('child 2');
-        JSON.stringify(res).length.should.be.above(2000000);
-      });
+    it('should work with a huge tree', async () => {
+      let res = await getHugeTree(5, 7);
+      res.name.should.equal('root');
+      res.children.c1.children.c2.children
+        .c3.children.c2.name.should.equal('child 2');
+      JSON.stringify(res).length.should.be.above(2000000);
     });
   });
 

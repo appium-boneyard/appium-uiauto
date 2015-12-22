@@ -1,37 +1,36 @@
-'use strict';
+// transpile:mocha
 
-var base = require('./base'),
-    path = require('path'),
-    rimraf = require('rimraf');
+import { instrumentsInstanceInit, globalInit, killAll } from './base';
+import path from'path';
+import { fs } from 'appium-support';
+
 
 describe('config', function () {
-  describe("custom sock", function () {
-    var altSockDir = '/tmp/abcd';
-    var altSock = path.resolve(altSockDir, 'sock');
-
-    before(function () {
-      rimraf.sync('/tmp/abcd');
+  describe('custom socket', function () {
+    let altSockDir = '/tmp/abcd';
+    let altSock = path.resolve(altSockDir, 'sock');
+    let ctx;
+    globalInit(this, {chai: true, sock: altSock});
+    before(async function () {
+      await fs.rimraf(altSockDir);
+      ctx = await instrumentsInstanceInit({ sock: altSock });
     });
-
-    base.globalInit(this, { chai: true, sock: altSock });
-
-    var ctx;
-    base.instrumentsInstanceInit({ sock: altSock })
-      .then(function (_ctx) { ctx = _ctx; }).done();
+    after(async () => {
+      await killAll(ctx);
+    });
 
     it('should use the alternate sock', function () {
       ctx.proxy.should.exist;
-      ctx.proxy.getSock().should.equal(altSock);
+      ctx.proxy.sock.should.equal(altSock);
     });
 
-    it('should work', function () {
-      return ctx.execFunc(
+    it('should work', async () => {
+      let res = await ctx.execFunc(
         function () {
-          return "OK Boss";
+          return 'OK Boss';
         }
-      ).then(function (res) {
-        res.should.equal("OK Boss");
-      });
+      );
+      res.should.equal('OK Boss');
     });
 
   });

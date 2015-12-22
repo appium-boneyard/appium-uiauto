@@ -1,23 +1,27 @@
+// transpile:mocha
 /* globals $, env */
-'use strict';
 
-var base = require('./base'),
-    _ = require('underscore');
+import { instrumentsInstanceInit, globalInit, killAll } from './base';
+import _ from 'lodash';
 
 describe('sendKey', function () {
-  var imports = { post: [
+  let imports = { post: [
      'uiauto/lib/mechanic-ext/keyboard-ext.js',
     'uiauto/lib/element-patch/helper-patch.js'
   ]};
-  base.globalInit(this, { imports: imports, bootstrap: 'basic'});
+  globalInit(this, {imports: imports, bootstrap: 'basic'});
 
   /* globals rootPage: true */
-  var ctx;
-  base.instrumentsInstanceInit()
-    .then(function (_ctx) { ctx = _ctx; }).done();
+  let ctx;
+  before(async function () {
+    ctx = await instrumentsInstanceInit();
+  });
+  after(async () => {
+    await killAll(ctx);
+  });
 
-  afterEach(function () {
-    return ctx.execFunc(
+  afterEach(async () => {
+    await ctx.execFunc(
       function () {
         $('#UICatalog').first().tap();
         $.delay(1000);
@@ -25,9 +29,10 @@ describe('sendKey', function () {
     );
   });
 
-  _([undefined,'oneByOne', 'grouped', 'setValue']).each(function (sendKeyStrategy) {
-    it('should work with strategy: ' + sendKeyStrategy, function () {
-      return ctx.execFunc(
+  let keyStrategies = [undefined, 'oneByOne', 'grouped', 'setValue'];
+  _.each(keyStrategies, function (sendKeyStrategy) {
+    it(`should work with strategy: ${sendKeyStrategy}`, async () => {
+      await ctx.execFunc(
         function (sendKeyStrategy) {
           env.sendKeyStrategy = sendKeyStrategy;
           $.delay(1000);
@@ -42,5 +47,4 @@ describe('sendKey', function () {
       );
     });
   });
-
 });

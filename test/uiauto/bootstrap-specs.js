@@ -1,47 +1,58 @@
-'use strict';
+// transpile:mocha
 
-var base = require('./base');
+import { instrumentsInstanceInit, globalInit, killAll } from './base';
+
 
 describe('bootstrap', function () {
+  describe('basic test bootstrap', function () {
+    globalInit(this, {bootstrap: 'basic'});
+    let ctx;
+    before(async function () {
+      ctx = await instrumentsInstanceInit();
+    });
+    after(async () => {
+      await killAll(ctx);
+    });
 
-  describe("basic test bootstrap", function () {
-    base.globalInit(this, {bootstrap: 'basic'});
-    var ctx;
-    base.instrumentsInstanceInit().then(function (_ctx) { ctx = _ctx; });
-
-    it('should start and execute one command', function () {
-      return ctx.sendCommand("'123'")
-        .should.become('123')
-        .then(function () { return ctx.sendCommand("typeof $.lookup"); })
-        .should.become('undefined')
-        .then(function () { return ctx.sendCommand("typeof chai"); })
-        .should.become('object');
+    it('should start and execute one command', async () => {
+      (await ctx.sendCommand("'123'")).should.equal('123');
+      (await ctx.sendCommand('typeof $.lookup')).should.equal('undefined');
+      (await ctx.sendCommand('typeof chai')).should.equal('object');
     });
   });
 
-  describe("regular bootstrap without chai", function () {
-    base.globalInit(this);
-    var ctx;
-    base.instrumentsInstanceInit().then(function (_ctx) { ctx = _ctx; });
+  describe('regular bootstrap without chai', function () {
+    globalInit(this);
+    let ctx;
+    before(async function () {
+      ctx = await instrumentsInstanceInit();
+    });
+    after(async () => {
+      if (ctx) {
+        await killAll(ctx);
+      }
+    });
 
-    it('should start and execute one command', function () {
-      return ctx.sendCommand("'123'")
-        .should.become('123')
-      .then(function () { return ctx.sendCommand("typeof chai"); })
-      .should.become('undefined');
+    it('should start and execute one command', async () => {
+      (await ctx.sendCommand("'123'")).should.equal('123');
+      (await ctx.sendCommand('typeof chai')).should.equal('undefined');
     });
   });
 
   describe("regular bootstrap with chai", function () {
-    base.globalInit(this, {chai: true});
-    var ctx;
-    base.instrumentsInstanceInit().then(function (_ctx) { ctx = _ctx; });
+    globalInit(this, {bootstrap: 'basic'});
+    let ctx;
+    before(async function () {
+      ctx = await instrumentsInstanceInit();
+    });
+    after(async () => {
+      await killAll(ctx
+        );
+    });
 
-    it('should start and execute one command', function () {
-      return ctx.sendCommand("'123'")
-        .should.become('123')
-      .then(function () { return ctx.sendCommand("typeof chai"); })
-      .should.become('object');
+    it('should start and execute one command', async () => {
+      (await ctx.sendCommand("'123'")).should.equal('123');
+      (await ctx.sendCommand('typeof chai')).should.equal('object');
     });
   });
 

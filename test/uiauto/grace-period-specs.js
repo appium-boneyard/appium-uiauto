@@ -1,46 +1,62 @@
+// transpile:mocha
 /* globals $ */
-'use strict';
 
-var base = require('./base');
+import { instrumentsInstanceInit, globalInit, killAll } from './base';
+import { getVersion } from 'appium-xcode';
+
+
 describe('grace period', function () {
-  var imports = { post: [
+  let imports = { post: [
     'uiauto/lib/mechanic-ext/gesture-ext.js',
     'uiauto/lib/mechanic-ext/keyboard-ext.js',
   ]};
-  base.globalInit(this, { imports: imports, bootstrap: 'basic'});
+  globalInit(this, {imports: imports, bootstrap: 'basic'});
 
-  describe("looking for unexistant object", function () {
-    var ctx;
-    base.instrumentsInstanceInit()
-      .then(function (_ctx) { ctx = _ctx; }).done();
+  describe('looking for non-existant object', function () {
+    let expectedTime = 2000;
+    let ctx;
+    before(async () => {
+      ctx = await instrumentsInstanceInit();
 
-    it('should be quick when grace period is not set', function () {
-      var refMs = Date.now();
-      return ctx.execFunc(
+      // xcode 7 is a bit slow.
+      let xcodeVersion = await getVersion();
+      if (xcodeVersion[0] >= 7) {
+        expectedTime = 4000;
+      }
+    });
+    after(async () => {
+      await killAll(ctx);
+    });
+
+    it('should be quick when grace period is not set', async () => {
+      let refMs = Date.now();
+      let res = await ctx.execFunc(
         function () {
           return $('#not exist');
         }
-      ).should.eventually.have.length(0)
-      .then(function () { (Date.now() - refMs).should.be.below(1000); });
+      );
+      (Date.now() - refMs).should.be.below(expectedTime);
+      res.should.have.length(0);
     });
 
-    it('should be quick when pushing and poping 0 timeout', function () {
-      var refMs = Date.now();
-      return ctx.execFunc(
+    it('should be quick when pushing and popping 0 timeout', async () => {
+      let refMs = Date.now();
+      let res = await ctx.execFunc(
         function () {
           $.target().pushTimeout(0);
           var res = $('#not exist');
           $.target().popTimeout();
           return res;
         }
-      ).should.eventually.have.length(0)
-      .then(function () { (Date.now() - refMs).should.be.below(1000); });
+      );
+      res.should.have.length(0);
+      (Date.now() - refMs).should.be.below(expectedTime);
     });
 
     // Skipping because of bug, it takes more than 25 second!
-    it.skip('should be quick when grace period is set to 1', function () {
-      var refMs = Date.now();
-      return ctx.execFunc(
+    it.skip('should be quick when grace period is set to 1', async () => {
+      let refMs = Date.now();
+      let res = await ctx.execFunc(
         function () {
           $.target().setTimeout(1);
           $.warn('lookup starting');
@@ -48,12 +64,9 @@ describe('grace period', function () {
           $.warn('lookup finished');
           return res;
         }
-      ).should.eventually.have.length(0)
-      .then(function () {
-        (Date.now() - refMs).should.be.below(5000);
-      });
+      );
+      res.should.have.length(0)
+      (Date.now() - refMs).should.be.below(5000);
     });
-
   });
-
 });

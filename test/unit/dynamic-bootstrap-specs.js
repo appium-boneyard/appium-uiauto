@@ -1,20 +1,20 @@
-'use strict';
+// transpile:mocha
 
-var chai = require('chai'),
-    fs = require('fs'),
-    prepareBootstrap = require('../../lib/dynamic-bootstrap').prepareBootstrap,
-    logger = require('../../lib/logger'),
-    Q = require('q'),
-    rimraf = Q.denodeify(require('rimraf')),
-    sinon = require('sinon'),
-    sinonChai = require("sinon-chai");
+import { prepareBootstrap } from '../..';
+import log from '../../lib/logger';
+import chai from 'chai';
+import { fs } from 'appium-support';
+import sinon from 'sinon';
+import sinonChai from 'sinon-chai';
+import path from 'path';
+
 
 chai.should();
 chai.use(sinonChai);
 
 describe('dynamic bootstrap', function () {
   function envFromCode(code) {
-    // let's pick out the dynamic env from the new bootrap file with this
+    // let's pick out the dynamic env from the new bootsrap file with this
     // regex so we can be sure it matches what we expect
     var envRe = /^bootstrap\((\{[^]+})\);$/m;
     var envStr = envRe.exec(code)[1];
@@ -22,65 +22,52 @@ describe('dynamic bootstrap', function () {
     return env;
   }
 
-  function checkCode(code) {
+  async function checkCode (code) {
     var env = envFromCode(code);
     env.nodePath.should.equal(process.execPath);
     env.commandProxyClientPath.should.exist;
     env.instrumentsSock.should.exist;
-    fs.existsSync(env.commandProxyClientPath).should.be.ok;
+    (await fs.exists(env.commandProxyClientPath)).should.be.true;
     return env;
   }
 
   before(function () {
-    sinon.spy(logger, "debug");
+    sinon.spy(log, 'debug');
   });
 
   after(function () {
-    logger.debug.restore();
+    log.debug.restore();
   });
 
-  it('should generate dynamic bootstrap', function (done) {
-    process.env.APPIUM_BOOTSTRAP_DIR = '/tmp/appium-uiauto/test/unit/bootstrap';
-    rimraf(process.env.APPIUM_BOOTSTRAP_DIR)
+  it('should generate dynamic bootstrap', async () => {
+    process.env.APPIUM_BOOTSTRAP_DIR = path.resolve('/', 'tmp', 'appium-uiauto', 'test', 'unit', 'bootstrap');
+    if (await fs.exists(process.env.APPIUM_BOOTSTRAP_DIR)) {
+      await fs.rimraf(process.env.APPIUM_BOOTSTRAP_DIR);
+    }
 
       // first call: should create new bootstrap file
-      .then(function () { return prepareBootstrap(); })
-      .then(function (bootstrapFile) {
-        bootstrapFile.should.match(/\/tmp\/appium-uiauto\/test\/unit\/bootstrap\/bootstrap\-.*\.js/);
-        var code = fs.readFileSync(bootstrapFile, 'utf8');
-        checkCode(code);
-      })
-      .then(function () {
-        logger.debug.calledWithMatch(/Creating or overwritting dynamic bootstrap/).should.be.ok;
-        logger.debug.reset();
-      })
+    let bootstrapFile = await prepareBootstrap();
+    bootstrapFile.should.match(/\/tmp\/appium-uiauto\/test\/unit\/bootstrap\/bootstrap\-.*\.js/);
+    let code = await fs.readFile(bootstrapFile, 'utf8');
+    await checkCode(code);
+    log.debug.calledWithMatch(/Creating or overwriting dynamic bootstrap/).should.be.true;
+    log.debug.reset();
 
-      // second call: should reuse bootstrap file
-      .then(function () { return prepareBootstrap(); })
-      .then(function (bootstrapFile) {
-        bootstrapFile.should.match(/\/tmp\/appium-uiauto\/test\/unit\/bootstrap\/bootstrap\-.*\.js/);
-        var code = fs.readFileSync(bootstrapFile, 'utf8');
-        checkCode(code);
-      }).then(function () {
-        logger.debug.calledWithMatch(/Reusing dynamic bootstrap/).should.be.ok;
-        logger.debug.reset();
-      })
+    // second call: should reuse bootstrap file
+    bootstrapFile = await prepareBootstrap();
+    bootstrapFile.should.match(/\/tmp\/appium-uiauto\/test\/unit\/bootstrap\/bootstrap\-.*\.js/);
+    code = await fs.readFile(bootstrapFile, 'utf8');
+    await checkCode(code);
+    log.debug.calledWithMatch(/Reusing dynamic bootstrap/).should.be.true;
+    log.debug.reset();
 
-      // fourth call using custom socket path: should create different bootstrap file
-      .then(function () {
-        return prepareBootstrap({sock: '/tmp/abcd/sock'});
-      }).then(function (bootstrapFile) {
-        bootstrapFile.should.match(/\/tmp\/appium-uiauto\/test\/unit\/bootstrap\/bootstrap\-.*\.js/);
-        var code = fs.readFileSync(bootstrapFile, 'utf8');
-        var env = checkCode(code, {isVerbose: true, gracePeriod: 5});
-        env.instrumentsSock.should.equal('/tmp/abcd/sock');
-      })
-      .then(function () {
-        logger.debug.calledWithMatch(/Creating or overwritting dynamic bootstrap/).should.be.ok;
-        logger.debug.reset();
-      })
-
-      .nodeify(done);
+    // third call using custom socket path: should create different bootstrap file
+    bootstrapFile = await prepareBootstrap({sock: '/tmp/abcd/sock'});
+    bootstrapFile.should.match(/\/tmp\/appium-uiauto\/test\/unit\/bootstrap\/bootstrap\-.*\.js/);
+    code = await fs.readFile(bootstrapFile, 'utf8');
+    let env = await checkCode(code, {isVerbose: true, gracePeriod: 5});
+    env.instrumentsSock.should.equal('/tmp/abcd/sock');
+    log.debug.calledWithMatch(/Creating or overwriting dynamic bootstrap/).should.be.ok;
+    log.debug.reset();
   });
-
 });

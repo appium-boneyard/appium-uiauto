@@ -1,196 +1,172 @@
-'use strict';
+import chai from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+import B from 'bluebird';
+import { UIAutoClient, prepareBootstrap } from '../..';
+import { utils as instrumentsUtils } from 'appium-instruments';
+import { getEnv } from '../../lib/dynamic-bootstrap';
+import log from '../../lib/logger';
+import _ from 'lodash';
+import path from 'path';
+import { fs } from 'appium-support';
+import { getVersion } from 'appium-xcode';
 
-
-var chai = require('chai'),
-    chaiAsPromised = require("chai-as-promised"),
-    Q = require('q'),
-    CommandProxy = require('../../lib/command-proxy'),
-    instrumentsUtils = require('appium-instruments').utils,
-    getEnv = require('../../lib/dynamic-bootstrap').getEnv,
-    _ = require('underscore'),
-    path = require('path'),
-    fs = require('fs'),
-    logger = require('../../lib/logger');
 
 chai.use(chaiAsPromised);
 chai.should();
 
 process.env.APPIUM_BOOTSTRAP_DIR = '/tmp/appium-uiauto/test/functional/bootstrap';
 
-if (process.env.VERBOSE) logger.setConsoleLevel('debug');
+let rootDir = path.resolve(__dirname, '..', '..', '..');
+if (!__dirname.match(/build\/test\/uiauto$/)) {
+  // we are not running tests in the `build` directory
+  rootDir = path.resolve(__dirname, '..', '..');
+}
 
-var prepareBootstrap = function (opts) {
+async function localPrepareBootstrap (opts) {
   opts = opts || {};
-  var rootDir = path.resolve(__dirname, '../..');
+  // let rootDir = path.resolve(__dirname, '..', '..', '..');
   if (opts.bootstrap === 'basic') {
-    var env = getEnv();
-    var postImports = [];
+    let env = getEnv();
+    let postImports = [];
     if (opts.imports && opts.imports.post) {
       postImports = opts.imports.post;
     }
-    postImports = _(postImports).map(function (item) {
-      return '#import "' + path.resolve( rootDir , item) + '"';
+    postImports = postImports.map((item) => {
+      return `#import "${path.resolve(rootDir , item)}"`;
     });
-    var code = fs.readFileSync(path.resolve(
-      __dirname, '../../test/assets/base-bootstrap.js'), 'utf8');
-    _({
+    let code = await fs.readFile(path.resolve(
+      rootDir, 'test', 'assets', 'base-bootstrap.js'), 'utf8');
+    let vars = {
       '<ROOT_DIR>': rootDir,
       '"<POST_IMPORTS>"': postImports.join('\n'),
       '<commandProxyClientPath>': env.commandProxyClientPath,
       '<nodePath>': env.nodePath,
       '<instrumentsSock>': env.instrumentsSock
-    }).each(function (value, key) {
+    };
+    for (let [key, value] of _.pairs(vars)) {
       code = code.replace(new RegExp(key, 'g'), value);
-    });
-    return require('../../lib/dynamic-bootstrap').prepareBootstrap({
+    }
+    return await prepareBootstrap({
       code: code,
       isVerbose: true
     });
   } else {
     opts = _.clone(opts);
     if (opts.chai) {
-      opts.imports = {};
-      opts.imports.pre =
-        [path.resolve(rootDir, 'node_modules/chai/chai.js')];
+      opts.imports = {
+        pre: [path.resolve(rootDir, 'node_modules/chai/chai.js')]
+      };
     }
     delete opts.chai;
-    return require('../../lib/dynamic-bootstrap')
-      .prepareBootstrap(opts);
+    return await prepareBootstrap(opts);
   }
-};
+}
 
-var newInstruments = function (bootstrapFile) {
-  return instrumentsUtils.quickInstrument({
-    app: path.resolve(__dirname, '../assets/UICatalog.app'),
+async function newInstruments (bootstrapFile) {
+  // starting tests differs on Xcode 7 vs. 6
+  let simulatorSdkAndDevice = 'iPhone 6 (8.1 Simulator)';
+  let withoutDelay = true;
+  let xcodeVersion = await getVersion(true);
+  if (xcodeVersion.versionFloat >= 7) {
+    simulatorSdkAndDevice = 'iPhone 6 (8.4)';
+    withoutDelay = false;
+  }
+
+  return await instrumentsUtils.quickInstruments({
+    app: path.resolve(rootDir, 'test', 'assets', 'UICatalog.app'),
     bootstrap: bootstrapFile,
-    logger: logger.instance(),
-    simulatorSdkAndDevice: 'iPhone 6 (8.1 Simulator)',
-    launchTries: 2
+    simulatorSdkAndDevice,
+    launchTries: 2,
+    withoutDelay
   });
-};
+}
 
-var init = function (bootstrapFile, opts) {
-  var deferred = Q.defer();
-  var proxy = new CommandProxy(opts);
-  var instruments;
-  proxy.start(
-    // first connection
-    function (err) {
-      instruments.launchHandler(err);
-      if (err) return deferred.reject(err);
-      deferred.resolve({proxy: proxy, instruments: instruments});
-    },
-    // regular cb
-    function (err) {
-      if (err) return deferred.reject(err);
-      newInstruments(bootstrapFile).then(function (_instruments) {
-        instruments = _instruments;
-        instruments.start(null, function () {
-          proxy.safeShutdown(function () {});
-        });
-      })
-      .catch(function (err) { deferred.reject(err); })
-      .done();
-    }
-  );
-  return deferred.promise;
-};
+async function init (bootstrapFile, sock) {
+  let proxy = new UIAutoClient(sock);
+  let instruments = await newInstruments(bootstrapFile);
+  instruments.onShutdown
+    .then(() => {
+      // expected shutdown, nothing to do
+    }).catch(async (err) => {
+      log.error(err);
+      await proxy.safeShutdown();
+      throw new Error('Unexpected shutdown of instruments');
+    }).done();
+  await B.all([
+    proxy.start().then(() => {
+      // everything looks good, notify instruments.
+      instruments.registerLaunch();
+    }),
+    instruments.launch()
+  ]);
+  return {proxy, instruments};
+}
 
-var killAll = function (ctx) {
-  return Q.nfcall(ctx.instruments.shutdown.bind(ctx.instruments))
-    .then(function () {
-      return instrumentsUtils.killAllInstruments();
-    }).catch(function () {})
-    .then(function () {
-      return ctx.proxy.safeShutdown(function () {});
-    });
-};
+async function killAll (ctx) {
+  try {
+    await ctx.instruments.shutdown();
+  } catch (e) {
+    // pass
+    log.error(e);
+  }
+  await instrumentsUtils.killAllInstruments();
+  await ctx.proxy.safeShutdown();
+}
 
-var bootstrapFile;
+let bootstrapFile;
 
-exports.globalInit = function (ctx, opts) {
-  ctx.timeout(180000);
-
-  before(function () {
-    return prepareBootstrap(opts).then(function (_bootstrapFile) {
-      bootstrapFile = _bootstrapFile;
-    });
+async function globalInit (ctx, opts) {
+  ctx.timeout(60000);
+  before(async () => {
+    bootstrapFile = await localPrepareBootstrap(opts);
   });
-};
+}
 
-exports.instrumentsInstanceInit = function (opts) {
-  var deferred = Q.defer();
+async function instrumentsInstanceInit (opts = {}) {
+  let ctx = await init(bootstrapFile, opts.sock);
+  ctx.sendCommand = async (cmd) => {
+    return ctx.proxy.sendCommand(cmd);
+  };
+  ctx.exec = ctx.sendCommand;
 
-  var ctx;
-  before(function () {
-    return init(bootstrapFile, opts)
-      .then(function (_ctx) {
-        ctx = _ctx;
-        ctx.sendCommand = function (cmd) {
-          var deferred = Q.defer();
-          ctx.proxy.sendCommand(cmd, function (result) {
-            if (result.status === 0) {
-              deferred.resolve(result.value);
-            } else {
-              deferred.reject(JSON.stringify(result));
-            }
-          });
-          return deferred.promise;
-        };
+  ctx.execFunc = async (func, params) => {
+    params = params || [];
+    let script =
+      `(function (){\n` +
+      `  var params = JSON.parse('${JSON.stringify(params)}');\n` +
+      `  return (${func.toString()}).apply(null, params);\n` +
+      `})();`;
+    return ctx.exec(script);
+  };
 
-        ctx.exec = ctx.sendCommand;
+  let cmd = `$.isVerbose = ${process.env.VERBOSE ? true : false};\n`;
+  await ctx.exec(cmd);
 
-        ctx.execFunc = function (func, params) {
-          params = params || [];
-          var script =
-            '(function (){' +
-            '  var params = JSON.parse(\'' + JSON.stringify(params) + '\');\n' +
-            '  return (' + func.toString() + ').apply(null, params);' +
-            '})();';
-          return ctx.exec(script);
-        };
-      }).then(function () {
-        var cmd = '';
-        cmd += '$.isVerbose = ' + (process.env.VERBOSE ? true : false) + ';\n';
-        return ctx.exec(cmd);
-      })
-      .then(function () {
-        // some uiauto helpers
-        return ctx.execFunc(function () {
-          /* global rootPage:true */
-          rootPage = {};
-          // click item in root page menu
-          rootPage.clickMenuItem = function (partialText) {
-            $.each($('tableview').children(), function (idx, child) {
-              if (child.name().indexOf(partialText) >= 0 ){
-                $(child).tap();
-                return false;
-              }
-            });
-          };
-        });
-      }).then(function () {
-        return ctx.execFunc(function () {
-          /* global $ */
-          $.delay(500);
-          while (!$('tableview').isVisible()) {
-            $.warn('waiting for page to load');
-            $.delay(500);
-          }
-        }).then(
-          function () {
-            deferred.resolve(ctx);
-          },
-          function (err) {
-            deferred.reject(err);
-          }
-        );
+  // some uiauto helpers
+  await ctx.execFunc(function () {
+    /* global rootPage:true */
+    rootPage = {};
+    // click item in root page menu
+    rootPage.clickMenuItem = function (partialText) {
+      $.each($('tableview').children(), function (idx, child) {
+        if (child.name().indexOf(partialText) >= 0 ){
+          $(child).tap();
+          return false;
+        }
       });
+    };
   });
 
-  after(function () {
-    return killAll(ctx);
+  await ctx.execFunc(function () {
+    /* global $ */
+    $.delay(500);
+    while (!$('tableview').isVisible()) {
+      $.warn('waiting for page to load');
+      $.delay(500);
+    }
   });
 
-  return deferred.promise;
-};
+  return ctx;
+}
+
+export { instrumentsInstanceInit, globalInit, killAll };

@@ -1,10 +1,12 @@
+// transpile:mocha
 /* globals $, rootPage, alerts */
-'use strict';
 
-var base = require('./base');
+import { instrumentsInstanceInit, globalInit, killAll } from './base';
+
+instrumentsInstanceInit;
 
 describe('alarm', function () {
-  var imports = { post: [
+  let imports = { post: [
     'uiauto/lib/alerts.js',
     'uiauto/lib/status.js',
     'uiauto/lib/element-patch/nil-patch.js',
@@ -14,32 +16,34 @@ describe('alarm', function () {
     'uiauto/lib/mechanic-ext/lookup-ext.js',
     'uiauto/lib/mechanic-ext/alert-ext.js'
   ]};
-  base.globalInit(this, { imports: imports, bootstrap: 'basic'});
 
-  describe("textfields", function () {
-    var ctx;
-    base.instrumentsInstanceInit()
-      .then(function (_ctx) { ctx = _ctx; }).done();
+  globalInit(this, {imports: imports, bootstrap: 'basic'});
 
-    before(function () {
-      return ctx.execFunc(
+
+  describe('textfields', function () {
+    let ctx;
+
+    before(async () => {
+      ctx = await instrumentsInstanceInit();
+      await ctx.execFunc(
         function () {
           alerts.configure();
         }
       );
     });
 
-    afterEach(function () {
-      return ctx.execFunc(
+    afterEach(async () => {
+      await ctx.execFunc(
         function () {
           $('#UICatalog').first().tap();
           $.delay(1000);
         }
       );
+      await killAll(ctx);
     });
 
-    it('should retrieve alert text and then accept alert', function () {
-      return ctx.execFunc(
+    it('should retrieve alert text and then accept alert', async () => {
+      let res = await ctx.execFunc(
         function () {
           rootPage.clickMenuItem('Alert Views');
           $.delay(2000);
@@ -49,10 +53,9 @@ describe('alarm', function () {
           $.acceptAlert();
           return alertText;
         }
-      ).then(function (res) {
-        console.warn('res -->', res);
-        res.should.include('A Short Title Is Best');
-      });
+      );
+      res.should.include('A Short Title Is Best');
+      res.should.include('A message should be a short, complete sentence.');
     });
   });
 });

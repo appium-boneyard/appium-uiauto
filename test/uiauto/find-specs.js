@@ -1,18 +1,22 @@
+// transpile:mocha
 /* globals $, rootPage */
-'use strict';
 
-var base = require('./base');
+import { instrumentsInstanceInit, globalInit, killAll } from './base';
 
 describe('find', function () {
-  base.globalInit(this, { chai: true });
+  globalInit(this, {chai: true});
 
   describe("textfields", function () {
-    var ctx;
-    base.instrumentsInstanceInit()
-      .then(function (_ctx) { ctx = _ctx; }).done();
+    let ctx;
+    before(async () => {
+      ctx = await instrumentsInstanceInit();
+    });
+    after(async () => {
+      await killAll(ctx);
+    });
 
-    afterEach(function () {
-      return ctx.execFunc(
+    afterEach(async () => {
+      await ctx.execFunc(
         function () {
           $('#UICatalog').first().tap();
           $.delay(1000);
@@ -20,8 +24,8 @@ describe('find', function () {
       );
     });
 
-    it('should not return duplicate UIATextField', function () {
-      return ctx.execFunc(
+    it('should not return duplicate UIATextField', async () => {
+      let res = await ctx.execFunc(
         function () {
           rootPage.clickMenuItem('Text Fields');
           $.delay(2000);
@@ -30,14 +34,12 @@ describe('find', function () {
           var res = $.getElementsByType('UIATextField', id);
           return res;
         }
-      ).then(function (res) {
-        console.warn('res -->', res);
-        res.should.have.length(1);
-      });
+      );
+      res.should.have.length(1);
     });
 
-    it('should not return duplicate UIASecureTextField', function () {
-      return ctx.execFunc(
+    it('should not return duplicate UIASecureTextField', async () => {
+      let res = await ctx.execFunc(
         function () {
           rootPage.clickMenuItem('Text Fields');
           $.delay(2000);
@@ -46,20 +48,23 @@ describe('find', function () {
           var res = $.getElementsByType('UIASecureTextField', id);
           return res;
         }
-      ).then(function (res) {
-        res.should.have.length(1);
-      });
+      );
+      res.should.have.length(1);
     });
 
   });
 
-  describe("byUIAutomation", function () {
-    var ctx;
-    base.instrumentsInstanceInit()
-      .then(function (_ctx) { ctx = _ctx; }).done();
+  describe('byUIAutomation', () => {
+    let ctx;
+    before(async () => {
+      ctx = await instrumentsInstanceInit();
+    });
+    after(async () => {
+      await killAll(ctx);
+    });
 
-    afterEach(function () {
-      return ctx.execFunc(
+    afterEach(async () => {
+      await ctx.execFunc(
         function () {
           $('#UICatalog').first().tap();
           $.delay(1000);
@@ -67,36 +72,34 @@ describe('find', function () {
       );
     });
 
-    it('should use global context by default', function () {
-      return ctx.execFunc(
+    it('should use global context by default', async () => {
+      let res = await ctx.execFunc(
         function () {
           rootPage.clickMenuItem('Text Fields');
           $.delay(2000);
           var res = $.getElementsByUIAutomation('.getAllWithPredicate("type contains[c] \'textfield\'", true)');
           return res;
         }
-      ).then(function (res) {
-        res.should.have.length(5);
-        res[0].ELEMENT.should.exist;
-      });
+      );
+      res.should.have.length(5);
+      res[0].ELEMENT.should.exist;
     });
 
-    it('should eval the raw code if it doesn\'t start with a dot', function () {
-      return ctx.execFunc(
+    it('should eval the raw code if it does not start with a dot', async () => {
+      let res = await ctx.execFunc(
         function () {
           rootPage.clickMenuItem('Text Fields');
           $.delay(2000);
           var res = $.getElementsByUIAutomation('$.getElementByType(\'UIATableCell\').getAllWithPredicate("type contains[c] \'textfield\'", true)');
           return res;
         }
-      ).then(function (res) {
-        res.should.have.length(1);
-        res[0].ELEMENT.should.exist;
-      });
+      );
+      res.should.have.length(1);
+      res[0].ELEMENT.should.exist;
     });
 
-    it('should retrieve context from cache when ctx param is a string', function () {
-      return ctx.execFunc(
+    it('should retrieve context from cache when ctx param is a string', async () => {
+      let res = await ctx.execFunc(
         function () {
           rootPage.clickMenuItem('Text Fields');
           $.delay(2000);
@@ -108,14 +111,13 @@ describe('find', function () {
           );
           return res;
         }
-      ).then(function (res) {
-        res.should.have.length(1);
-        res[0].ELEMENT.should.exist;
-      });
+      );
+      res.should.have.length(1);
+      res[0].ELEMENT.should.exist;
     });
 
-    it('should use context when ctx param is an object', function () {
-      return ctx.execFunc(
+    it('should use context when ctx param is an object', async () => {
+      let res = await ctx.execFunc(
         function () {
           rootPage.clickMenuItem('Text Fields');
           $.delay(2000);
@@ -126,14 +128,13 @@ describe('find', function () {
           );
           return res;
         }
-      ).then(function (res) {
-        res.should.have.length(1);
-        res[0].ELEMENT.should.exist;
-      });
+      );
+      res.should.have.length(1);
+      res[0].ELEMENT.should.exist;
     });
 
-    it('should work when retrieving only one element', function () {
-      return ctx.execFunc(
+    it('should work when retrieving only one element', async () => {
+      let res = await ctx.execFunc(
         function () {
           rootPage.clickMenuItem('Text Fields');
           $.delay(2000);
@@ -163,10 +164,9 @@ describe('find', function () {
 
           return res;
         }
-      ).then(function (res) {
-        res.should.have.length(4);
-        res[0].ELEMENT.should.exist;
-      });
+      );
+      res.should.have.length(4);
+      res[0].ELEMENT.should.exist;
     });
 
   });

@@ -1,25 +1,30 @@
+// transpile:mocha
 /* globals $ */
-'use strict';
 
-var base = require('./base'),
-    _ = require('underscore');
+import { instrumentsInstanceInit, globalInit, killAll } from './base';
+import _ from 'lodash';
+
 
 describe('keyboard', function () {
-  var imports = { post: [
+  let imports = { post: [
     'uiauto/lib/mechanic-ext/gesture-ext.js',
     'uiauto/lib/mechanic-ext/keyboard-ext.js',
     'uiauto/lib/element-patch/nil-patch.js'
   ]};
-  base.globalInit(this, { imports: imports, bootstrap: 'basic'});
+  globalInit(this, {imports: imports, bootstrap: 'basic'});
 
-  describe("hide keyboard", function () {
+  describe('hide keyboard', function () {
     /* globals rootPage: true */
-    var ctx;
-    base.instrumentsInstanceInit()
-      .then(function (_ctx) { ctx = _ctx; }).done();
+    let ctx;
+    before(async () => {
+      ctx = await instrumentsInstanceInit();
+    });
+    after(async () => {
+      await killAll(ctx);
+    });
 
-    afterEach(function () {
-      return ctx.execFunc(
+    afterEach(async () => {
+      await ctx.execFunc(
         function () {
           $('#UICatalog').first().tap();
           $.delay(1000);
@@ -27,10 +32,9 @@ describe('keyboard', function () {
       );
     });
 
-    _(['pressKey', 'press']).each(function (strategy) {
-      it('should hide the keyboard by pressing the done key (' +
-          strategy + ')', function () {
-        return ctx.execFunc(
+    _.each(['pressKey', 'press'], function (strategy) {
+      it(`should hide the keyboard by pressing the done key (${strategy})`, async () => {
+        await ctx.execFunc(
           function (strategy) {
             rootPage.clickMenuItem('Text Fields');
             $('textfield').first().tap();
@@ -42,10 +46,9 @@ describe('keyboard', function () {
       });
     });
 
-    _(['tapOutside', 'tapOut']).each(function (strategy) {
-      it('should hide the keyboard by tapping outside(' +
-          strategy + ')', function () {
-        return ctx.execFunc(
+    _.each(['tapOutside', 'tapOut'], function (strategy) {
+      it(`should hide the keyboard by tapping outside (${strategy})`, async () => {
+        await ctx.execFunc(
           function (strategy) {
             rootPage.clickMenuItem('Web View');
             $('textfield').first().tap();
@@ -57,8 +60,8 @@ describe('keyboard', function () {
       });
     });
 
-    it('should hide the keyboard with the default strategy', function () {
-      return ctx.execFunc(
+    it('should hide the keyboard with the default strategy', async () => {
+      await ctx.execFunc(
         function () {
           rootPage.clickMenuItem('Web View');
           $('textfield').first().tap();
@@ -68,7 +71,5 @@ describe('keyboard', function () {
         }
       );
     });
-
   });
-
 });

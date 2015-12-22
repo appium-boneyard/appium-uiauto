@@ -1,6 +1,4 @@
 node_modules
-build
 *.log
-old
-.DS_Store
+test/assets
 coverage
