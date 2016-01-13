@@ -27,10 +27,14 @@
         if (text.indexOf('http') === 0 || text === "") {
           text = texts.last().name();
         } else {
-          text = texts[0].name();
-          var subtext = texts[1].name();
-          if (subtext !== null) {
-            text = text + ' ' + subtext;
+          // go through all the text elements and concatenate
+          text = null;
+          for (var i = 0; i < texts.length; i++) {
+            var subtext = texts[i].name();
+            if (subtext) {
+              // if there is text, append it, otherwise use sub text
+              text = text ? text + ' ' + subtext : subtext;
+            }
           }
         }
       }
