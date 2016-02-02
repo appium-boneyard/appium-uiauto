@@ -8,6 +8,29 @@
     $('alert').forEach(function (_alert) {
       if (!alert && _alert.isValid()) alert = _alert;
     });
+
+    // If we haven't found an alert yet, check for an iOS 9.3 Safari alert
+    if (!alert && parseFloat($.systemVersion) >= 9.3 && $._getElementsByXpath("//UIAScrollView")[0]) {
+      // If there's a Safari alert, it's always the first UIAScrollView
+      var possibleAlert = $._getElementsByXpath("//UIAScrollView")[0];
+      var possibleAlertButtons = possibleAlert.buttons();
+
+      // We're assuming it's a Safari alert if it's a UIAScrollView with a single "Close" button (alert)
+      // or both "Cancel" and "OK" buttons (prompt/confirm)
+      if ((possibleAlertButtons.length === 1 && possibleAlertButtons[0].name() == "Close") ||
+          (possibleAlertButtons.length === 2 && possibleAlertButtons[0].name() == "Cancel"
+           && possibleAlertButtons[1].name() == "OK")) {
+        alert = possibleAlert;
+
+        // Since our alert doesn't have defaultButton or cancelButton methods, we'll create our own
+        alert.defaultButton = function () {
+          return this.buttons().length === 2 ? this.buttons()[1] : this.buttons()[0];
+        }
+        alert.cancelButton = function () {
+          return this.buttons()[0];
+        }
+      }
+    }
     return alert || $.nil;
   };
 
@@ -37,6 +60,10 @@
             }
           }
         }
+      } else if (parseFloat($.systemVersion) >= 9.3) {
+        // iOS 9.3 Safari alerts only have one UIATextView
+        texts = this.getElementsByType('UIATextView', alert);
+        text = texts[0].name();
       }
       return text;
     }
@@ -44,7 +71,7 @@
   , setAlertText: function (text) {
       var alert = getAlert();
       var el = this.getElementByType('textfield', alert);
-      if (el) {
+      if (el && el.isVisible()) {
         el.setValueByType(text);
       } else {
         throw new ERROR.ElementNotVisible(
