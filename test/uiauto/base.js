@@ -43,7 +43,7 @@ async function localPrepareBootstrap (opts) {
       '<nodePath>': env.nodePath,
       '<instrumentsSock>': env.instrumentsSock
     };
-    for (let [key, value] of _.pairs(vars)) {
+    for (let [key, value] of _.toPairs(vars)) {
       code = code.replace(new RegExp(key, 'g'), value);
     }
     return await prepareBootstrap({

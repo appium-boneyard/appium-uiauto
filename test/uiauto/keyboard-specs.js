@@ -8,6 +8,7 @@ import _ from 'lodash';
 describe('keyboard', function () {
   let imports = { post: [
     'uiauto/lib/mechanic-ext/gesture-ext.js',
+    'uiauto/lib/mechanic-ext/device-ext.js',
     'uiauto/lib/mechanic-ext/keyboard-ext.js',
     'uiauto/lib/element-patch/nil-patch.js'
   ]};
@@ -16,21 +17,21 @@ describe('keyboard', function () {
   describe('hide keyboard', function () {
     /* globals rootPage: true */
     let ctx;
-    before(async () => {
+    beforeEach(async () => {
       ctx = await instrumentsInstanceInit();
     });
-    after(async () => {
+    afterEach(async () => {
       await killAll(ctx);
     });
 
-    afterEach(async () => {
-      await ctx.execFunc(
-        function () {
-          $('#UICatalog').first().tap();
-          $.delay(1000);
-        }
-      );
-    });
+    // afterEach(async () => {
+    //   await ctx.execFunc(
+    //     function () {
+    //       $.back();
+    //       $.delay(1000);
+    //     }
+    //   );
+    // });
 
     _.each(['pressKey', 'press'], function (strategy) {
       it(`should hide the keyboard by pressing the done key (${strategy})`, async () => {
