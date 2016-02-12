@@ -10,7 +10,7 @@
         button = buttons[0];
       } else {
         button = buttons.Back;
-        if (button.type() === 'UIAElementNil') button = buttons[0];
+        if (button && button.type && button.type() === 'UIAElementNil') button = buttons[0];
       }
       try {
         button.tap();
