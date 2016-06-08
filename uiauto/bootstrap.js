@@ -1,4 +1,4 @@
-/* globals env, alerts, commands */
+/* globals env, alerts, commands, $ */
 
 /* jshint ignore:start */
 #import "./vendors/mechanic.js"
@@ -19,6 +19,10 @@ var bootstrap;
     } else {
       alerts.configure();
       commands.startProcessing();
+    }
+
+    if (env.initialLocation) {
+      $.target().setLocation(env.initialLocation);
     }
   };
 })();

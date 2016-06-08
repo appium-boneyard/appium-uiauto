@@ -12,6 +12,7 @@ var env;
     this.autoAcceptAlerts = dynamicEnv.autoAcceptAlerts;
     this.autoDismissAlerts = dynamicEnv.autoDismissAlerts;
     this.sendKeyStrategy = dynamicEnv.sendKeyStrategy;
+    this.initialLocation = dynamicEnv.initialLocation;
   };
 
 })();
