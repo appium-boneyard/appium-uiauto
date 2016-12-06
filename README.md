@@ -8,13 +8,13 @@
 [![Build Status](https://api.travis-ci.org/appium/appium-uiauto.png?branch=2.0)](https://travis-ci.org/appium/appium-uiauto)
 [![Coverage Status](https://coveralls.io/repos/appium/appium-uiauto/badge.svg?branch=2.0)](https://coveralls.io/r/appium/appium-uiauto?branch=2.0)
 
-
 Appium interface for the iOS [UI Automation](https://developer.apple.com/library/watchos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/UIAutomation.html) framework. Provides access to the JavaScript [API](https://developer.apple.com/library/ios/documentation/DeveloperTools/Reference/UIAutomationRef/).
 
 Consists of a client, `UIAutoClient`, through which you interact with the iOS UI Automation framework, and a server which is embedded on the device, running the commands in the context of the running application.
 
 In addition, there is a tool, `prepareBootstrap`, which builds a script which will be inserted onto the device. Any code that is necessary for running the commands can be added through that tool.
 
+*Note*: Issue tracking for this repo has been disabled. Please use the [main Appium issue tracker](https://github.com/appium/appium/issues) instead.
 
 ### Usage
 
