@@ -81,7 +81,7 @@ describe('find', function () {
           return res;
         }
       );
-      res.should.have.length(5);
+      res.should.have.length.at.least(4);
       res[0].ELEMENT.should.exist;
     });
 

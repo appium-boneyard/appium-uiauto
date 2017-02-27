@@ -14,7 +14,8 @@ describe('alarm', function () {
     'uiauto/lib/mechanic-ext/basics-ext.js',
     'uiauto/lib/mechanic-ext/util-ext.js',
     'uiauto/lib/mechanic-ext/lookup-ext.js',
-    'uiauto/lib/mechanic-ext/alert-ext.js'
+    'uiauto/lib/mechanic-ext/alert-ext.js',
+    'uiauto/lib/mechanic-ext/xpath-ext.js'
   ]};
 
   globalInit(this, {imports: imports, bootstrap: 'basic'});
