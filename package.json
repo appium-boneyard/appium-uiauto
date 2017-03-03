@@ -26,8 +26,7 @@
   "dependencies": {
     "appium-base-driver": "^2.0.1",
     "appium-instruments": "^3.6.0",
-    "appium-logger": "^2.1.0",
-    "appium-support": "^2.0.9",
+    "appium-support": "^2.5.0",
     "babel-runtime": "=5.8.24",
     "bluebird": "^2.9.32",
     "lodash": "^4.3.0",
@@ -46,7 +45,7 @@
     "chai": "^3.3.0",
     "chai-as-promised": "^5.1.0",
     "gulp": "^3.9.0",
-    "npmlog": "^1.2.1",
+    "npmlog": "2.x",
     "sinon": "^1.17.1",
     "sinon-chai": "^2.8.0"
   }

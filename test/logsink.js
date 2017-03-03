@@ -1,7 +1,8 @@
 import npmlog from 'npmlog';
-import { patchLogger } from 'appium-logger';
+import { logger } from 'appium-support';
+
 
 // pass  --require './build/test/logsink' arguments in mocha
-patchLogger(npmlog);
+logger.patchLogger(npmlog);
 global._global_npmlog = npmlog;
-npmlog.level = process.env.VERBOSE ? 'debug' : 'info';
+npmlog.level = (process.env.VERBOSE || process.env._FORCE_LOGS) ? 'debug' : 'info';

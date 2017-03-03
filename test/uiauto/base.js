@@ -22,9 +22,7 @@ if (!__dirname.match(/build\/test\/uiauto$/)) {
   rootDir = path.resolve(__dirname, '..', '..');
 }
 
-async function localPrepareBootstrap (opts) {
-  opts = opts || {};
-  // let rootDir = path.resolve(__dirname, '..', '..', '..');
+async function localPrepareBootstrap (opts = {}) {
   if (opts.bootstrap === 'basic') {
     let env = getEnv();
     let postImports = [];
@@ -68,7 +66,7 @@ async function newInstruments (bootstrapFile) {
   let withoutDelay = true;
   let xcodeVersion = await getVersion(true);
   if (xcodeVersion.versionFloat >= 7) {
-    simulatorSdkAndDevice = 'iPhone 6 (8.4)';
+    simulatorSdkAndDevice = 'iPhone 6 (9.3)';
     withoutDelay = false;
   }
 
@@ -116,7 +114,7 @@ async function killAll (ctx) {
 let bootstrapFile;
 
 async function globalInit (ctx, opts) {
-  ctx.timeout(60000);
+  ctx.timeout(240000);
   before(async () => {
     bootstrapFile = await localPrepareBootstrap(opts);
   });

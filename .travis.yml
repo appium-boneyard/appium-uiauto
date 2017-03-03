@@ -1,20 +1,16 @@
-language:
-  - objective-c
-osx_image: mavericks
-
-before_install:
-
+language: node_js
+os: osx
+osx_image: xcode7.3
+node_js:
+  - "4"
+  - "6"
+  - "7"
 install:
-  - rm -rf ~/.nvm
-  - git clone https://github.com/creationix/nvm.git ~/.nvm
-  - source ~/.nvm/nvm.sh
-  - nvm install 0.12
-  - node --version
   - npm install
   - npm install -g gulp
-
+  - xcodebuild -version
+  - xcrun simctl list
 script:
-  - gulp once
-
+  - _FORCE_LOGS=1 gulp once
 after_success:
   - gulp coveralls
